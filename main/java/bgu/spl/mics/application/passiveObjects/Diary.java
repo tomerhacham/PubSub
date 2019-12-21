@@ -11,12 +11,20 @@ import java.util.List;
  * You can add ONLY private fields and methods to this class as you see fit.
  */
 public class Diary {
+
+	//Fields:
+	private static Diary diary=null;
 	/**
 	 * Retrieves the single instance of this class.
 	 */
+	public Diary(){}
+
 	public static Diary getInstance() {
-		//TODO: Implement this
-		return null;
+		if(diary==null)
+		{
+			diary=new Diary();
+		}
+		return diary;
 	}
 
 	public List<Report> getReports() {

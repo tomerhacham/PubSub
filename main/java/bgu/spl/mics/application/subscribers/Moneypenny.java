@@ -10,7 +10,10 @@ import bgu.spl.mics.Subscriber;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class Moneypenny extends Subscriber {
+	//Fields:
+	private Integer id;
 
+	//Constructor:
 	public Moneypenny() {
 		super("Change_This_Name");
 		// TODO Implement this

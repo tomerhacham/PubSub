@@ -10,6 +10,10 @@ import bgu.spl.mics.Subscriber;
  */
 public class M extends Subscriber {
 
+	//Fields:
+	private Integer id;
+
+	//Constructor:
 	public M() {
 		super("Change_This_Name");
 		// TODO Implement this
