@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -14,10 +15,17 @@ public class Diary {
 
 	//Fields:
 	private static Diary diary=null;
+	private List<Report> reports; //only executed missions will be reported here
+	private int total; //total number of received missions
 	/**
 	 * Retrieves the single instance of this class.
 	 */
-	public Diary(){}
+	private Diary()
+	{
+		reports = new LinkedList<>();
+		total=0;
+
+	}
 
 	public static Diary getInstance() {
 		if(diary==null)
@@ -28,7 +36,7 @@ public class Diary {
 	}
 
 	public List<Report> getReports() {
-		return null;
+		return reports;
 	}
 
 	/**
@@ -36,7 +44,8 @@ public class Diary {
 	 * @param reportToAdd - the report to add
 	 */
 	public void addReport(Report reportToAdd){
-		//TODO: Implement this
+		reports.add(reportToAdd);
+		total++;
 	}
 
 	/**
@@ -55,7 +64,6 @@ public class Diary {
 	 * @return the total number of received missions (executed / aborted) be all the M-instances.
 	 */
 	public int getTotal(){
-		//TODO: Implement this
-		return 0;
+		return total;
 	}
 }
