@@ -30,7 +30,7 @@ public class TimeService extends Publisher {
 	}
 
 	@Override
-	protected void initialize() {this.run();}
+	protected void initialize() {}
 
 	@Override
 	public void run() {
