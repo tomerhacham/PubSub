@@ -5,8 +5,22 @@ import bgu.spl.mics.Message;
 
 public class TickBroadcast implements Broadcast {
     //fields:
-    //constructors:
-    public TickBroadcast(){}
-    //methods:
+    private int tickNum;
+    private boolean termminate=false;
 
+    //constructors:
+    public TickBroadcast(int tickNum){this.tickNum=tickNum;}
+
+    //methods:
+    public int getTickNum() {
+        return tickNum;
+    }
+
+    public void setTermminate(boolean termminate) {
+        this.termminate = termminate;
+    }
+
+    public boolean isTermminate() {
+        return termminate;
+    }
 }
