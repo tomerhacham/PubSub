@@ -1,5 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import bgu.spl.mics.application.subscribers.M;
+
 import java.util.List;
 
 /**
@@ -9,49 +11,68 @@ import java.util.List;
  * You may add ONLY private fields and methods to this class.
  */
 public class Report {
+
+	private String MissionName;
+	private int M;
+	private int Moneypenny;
+	private List<String> AgentsSerialNumbers;
+	private List<String> AgentsNames;
+	private String GadgetName;
+	private int TimeIssued;
+	private int QTime;
+	private int TimeCreated;
+
+	public Report (String missionName, int m, int moneypenny, List<String> agentsSerialNumbers, List<String> agentsNames, String gadgetName, int timeIssued, int QTime,int timeCreated){
+		this.MissionName= missionName;
+		this.M= m;
+		this.Moneypenny= moneypenny;
+		this.AgentsSerialNumbers= agentsSerialNumbers;
+		this.AgentsNames= agentsNames;
+		this.GadgetName =gadgetName;
+		this.TimeIssued= timeIssued;
+		this.QTime= QTime;
+		this.TimeCreated= timeCreated;
+	}
 	/**
      * Retrieves the mission name.
      */
 	public String getMissionName() {
-		// TODO Implement this
-		return null;
+		return this.MissionName;
 	}
 
 	/**
 	 * Sets the mission name.
 	 */
 	public void setMissionName(String missionName) {
-		// TODO Implement this
+		this.MissionName= missionName;
 	}
 
 	/**
 	 * Retrieves the M's id.
 	 */
 	public int getM() {
-		// TODO Implement this
-		return 0;
+		return M;
 	}
 
 	/**
 	 * Sets the M's id.
 	 */
 	public void setM(int m) {
-		// TODO Implement this
+		this.M= m;
 	}
 
 	/**
 	 * Retrieves the Moneypenny's id.
 	 */
 	public int getMoneypenny() {
-		// TODO Implement this
-		return 0;
+		return this.Moneypenny;
 	}
 
 	/**
 	 * Sets the Moneypenny's id.
 	 */
 	public void setMoneypenny(int moneypenny) {
-		// TODO Implement this
+		this.Moneypenny= moneypenny;
 	}
 
 	/**
@@ -60,15 +81,14 @@ public class Report {
 	 * @return The serial numbers of the agents.
 	 */
 	public List<String> getAgentsSerialNumbersNumber() {
-		// TODO Implement this
-		return null;
+		return this.AgentsSerialNumbers;
 	}
 
 	/**
 	 * Sets the serial numbers of the agents.
 	 */
 	public void setAgentsSerialNumbersNumber(List<String> agentsSerialNumbersNumber) {
-		// TODO Implement this
+		this.AgentsSerialNumbers= agentsSerialNumbersNumber;
 	}
 
 	/**
@@ -77,15 +97,14 @@ public class Report {
 	 * @return The agents names.
 	 */
 	public List<String> getAgentsNames() {
-		// TODO Implement this
-		return null;
+		return this.AgentsNames;
 	}
 
 	/**
 	 * Sets the agents names.
 	 */
 	public void setAgentsNames(List<String> agentsNames) {
-		// TODO Implement this
+		this.AgentsNames= agentsNames;
 	}
 
 	/**
@@ -94,59 +113,55 @@ public class Report {
 	 * @return the name of the gadget.
 	 */
 	public String getGadgetName() {
-		// TODO Implement this
-		return null;
+		return this.GadgetName;
 	}
 
 	/**
 	 * Sets the name of the gadget.
 	 */
 	public void setGadgetName(String gadgetName) {
-		// TODO Implement this
+		this.GadgetName= gadgetName;
 	}
 
 	/**
 	 * Retrieves the time-tick in which Q Received the GadgetAvailableEvent for that mission.
 	 */
 	public int getQTime() {
-		// TODO Implement this
-		return 0;
+		return this.QTime;
 	}
 
 	/**
 	 * Sets the time-tick in which Q Received the GadgetAvailableEvent for that mission.
 	 */
 	public void setQTime(int qTime) {
-		// TODO Implement this
+		this.QTime= qTime;
 	}
 
 	/**
 	 * Retrieves the time when the mission was sent by an Intelligence Publisher.
 	 */
 	public int getTimeIssued() {
-		// TODO Implement this
-		return 0;
+		return this.TimeIssued;
 	}
 
 	/**
 	 * Sets the time when the mission was sent by an Intelligence Publisher.
 	 */
 	public void setTimeIssued(int timeIssued) {
-		// TODO Implement this
+		this.TimeIssued= timeIssued;
 	}
 
 	/**
 	 * Retrieves the time-tick when the report has been created.
 	 */
 	public int getTimeCreated() {
-		// TODO Implement this
-		return 0;
+		return this.TimeCreated;
 	}
 
 	/**
 	 * Sets the time-tick when the report has been created.
 	 */
 	public void setTimeCreated(int timeCreated) {
-		// TODO Implement this
+		this.TimeCreated= timeCreated;
 	}
 }

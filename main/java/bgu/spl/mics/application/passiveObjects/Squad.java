@@ -1,6 +1,8 @@
 package bgu.spl.mics.application.passiveObjects;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedList;
 
 /**
  * Passive data-object representing a information about an agent in MI6.
@@ -67,8 +69,19 @@ public class Squad {
 	 * @return ‘false’ if an agent of serialNumber ‘serial’ is missing, and ‘true’ otherwise
 	 */
 	public boolean getAgents(List<String> serials){
+		boolean flag=true;
+		for (String serial: serials){
+			if(!agents.containsKey(serial)){
+				flag= false;
+			}
+		}
+		if(flag){
+			for (String serial: serials){
+				agents.get(serial).acquire();
+			}
+		}
 		// TODO Implement this
-		return false;
+		return flag;
 	}
 
     /**
@@ -77,8 +90,12 @@ public class Squad {
      * @return a list of the names of the agents with the specified serials.
      */
     public List<String> getAgentsNames(List<String> serials){
-        // TODO Implement this
-	    return null;
+    	LinkedList<String> group= new LinkedList<>() ;
+    	for (String serial: serials){
+			group.add(this.agents.get(serial).getName());
+		}
+
+	    return group;
     }
 
 }
