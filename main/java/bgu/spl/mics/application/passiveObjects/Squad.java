@@ -1,7 +1,5 @@
 package bgu.spl.mics.application.passiveObjects;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.LinkedList;
 
 /**
@@ -20,7 +18,9 @@ public class Squad {
 	/**
 	 * private constructor for the use of getInstance method only
 	 */
-	private Squad(){}
+	private Squad(){
+		this.agents= new HashMap<>();
+	}
 
 	//Methods:
 	/**
