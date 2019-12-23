@@ -2,12 +2,12 @@ package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.Publisher;
 import bgu.spl.mics.Subscriber;
+import bgu.spl.mics.application.messages.MissionReceivedEvent;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.passiveObjects.MissionInfo;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Flow;
 
 /**
  * A Publisher only.
@@ -17,17 +17,44 @@ import java.util.concurrent.Flow;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class Intelligence extends Subscriber {
-	private List<MissionInfo> mission;
+	private int tick=0;
+	private List<MissionInfo> missions;
 
 
 	public Intelligence(List<MissionInfo> mission) {
 		super("Intelligence");
-		this.mission=mission;
+		this.missions=mission;
 	}
 
 	@Override
 	protected void initialize() {
-		// TODO Implement this
+		subscribeBroadcast(TickBroadcast.class , br -> {
+			if (br.isTermminate())
+			{ terminate(); }
+			if(br.getTickNum()>=0){
+				tick=br.getTickNum();
+				MissionReceivedEvent eventToSend = checkForMissionAtTick(tick);
+				if(eventToSend.getMissionInfo()!=null){
+					super.getSimplePublisher().sendEvent(eventToSend);
+				}
+			}
+		});
+	}
+
+	/**
+	 * method will check is there is any mission available for the specific tick and if so will create an MissionReceivedEvent
+	 * @param tick
+	 * @return
+	 */
+	private MissionReceivedEvent checkForMissionAtTick(int tick){
+		MissionReceivedEvent missionReceivedEvent=null;
+		for (MissionInfo missioninfo:missions)
+		{
+			if(missioninfo.getTimeIssued()==tick){
+				missionReceivedEvent = new MissionReceivedEvent(missioninfo);
+			}
+		}
+		return missionReceivedEvent;
 	}
 
 }
