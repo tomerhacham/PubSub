@@ -32,7 +32,13 @@ public class Q extends Subscriber {
 				tick = br.getTickNum();
 			}
 		});
-		subscribeEvent(GadgetAvailableEvent.class, )
+		subscribeEvent(GadgetAvailableEvent.class,check ->{
+			String requested_gadget=check.getRequested_gadget();
+			if(inventory.getItem(requested_gadget)){
+				check.getFuture().resolve(requested_gadget);
+				}
+			//TODO: what happend if the gadget is not available
+		});
 
 	}
 }
