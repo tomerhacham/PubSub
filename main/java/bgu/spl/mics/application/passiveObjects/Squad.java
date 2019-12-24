@@ -1,6 +1,8 @@
 package bgu.spl.mics.application.passiveObjects;
 import java.util.*;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Passive data-object representing a information about an agent in MI6.
@@ -19,7 +21,7 @@ public class Squad {
 	 * private constructor for the use of getInstance method only
 	 */
 	private Squad(){
-		this.agents= new HashMap<>();
+		this.agents= new ConcurrentHashMap<>();
 	}
 
 	//Methods:

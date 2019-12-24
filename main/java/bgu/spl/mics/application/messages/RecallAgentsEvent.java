@@ -1,20 +1,18 @@
 package bgu.spl.mics.application.messages;
 
-import bgu.spl.mics.Event;
-import bgu.spl.mics.Message;
-
 import java.util.LinkedList;
 import java.util.List;
 
-public class AgentsAvailableEvent implements Event {
+public class RecallAgentsEvent {
     //fields:
     private List<String> serialAgentsNumbers;
-    //constructor:
-    public AgentsAvailableEvent(List<String> serialAgentsNumbers){
+    //constructors:
+    public RecallAgentsEvent(List<String> serialAgentsNumbers){
         this.serialAgentsNumbers=serialAgentsNumbers;
     }
     //methods:
-    public List<String> getSerialAgentsNumbers(){
+    public List<String> GetSerialAgentsNumbers(){
         return this.serialAgentsNumbers;
     }
+
 }

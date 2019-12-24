@@ -2,6 +2,7 @@ package bgu.spl.mics.application.passiveObjects;
 
 import bgu.spl.mics.application.subscribers.M;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -15,23 +16,14 @@ public class Report {
 	private String MissionName;
 	private int M;
 	private int Moneypenny;
-	private List<String> AgentsSerialNumbers;
-	private List<String> AgentsNames;
+	private List<String> AgentsSerialNumbers= new LinkedList<>();
+	private List<String> AgentsNames= new LinkedList<>();
 	private String GadgetName;
 	private int TimeIssued;
 	private int QTime;
 	private int TimeCreated;
 
-	public Report (String missionName, int m, int moneypenny, List<String> agentsSerialNumbers, List<String> agentsNames, String gadgetName, int timeIssued, int QTime,int timeCreated){
-		this.MissionName= missionName;
-		this.M= m;
-		this.Moneypenny= moneypenny;
-		this.AgentsSerialNumbers= agentsSerialNumbers;
-		this.AgentsNames= agentsNames;
-		this.GadgetName =gadgetName;
-		this.TimeIssued= timeIssued;
-		this.QTime= QTime;
-		this.TimeCreated= timeCreated;
+	public Report() {
 	}
 	/**
      * Retrieves the mission name.

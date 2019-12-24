@@ -28,7 +28,15 @@ public class Future<T> {
      * 	       
      */
 	public T get() {
-		return result;
+		while(!isDone()){
+			try {
+				wait();
+				return result;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 	
 	/**
