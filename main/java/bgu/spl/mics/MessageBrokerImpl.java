@@ -1,6 +1,9 @@
 package bgu.spl.mics;
 
+import jdk.nashorn.internal.ir.Block;
+
 import java.util.*;
+import java.util.concurrent.*;
 
 
 /**
@@ -11,8 +14,10 @@ import java.util.*;
 public class MessageBrokerImpl implements MessageBroker {
 	//Fields:
 	private static MessageBrokerImpl messageBroker=null;
-	private Map<String, ArrayList> eventsPool = new HashMap<>();
-	public LinkedList<RunnableSubPub> allSubPubs = new LinkedList<>();
+	private ConcurrentMap<String, ConcurrentLinkedQueue> eventsPool = new ConcurrentHashMap<>();
+	private ConcurrentMap<Event,Future> futures = new ConcurrentHashMap<>();
+	private ConcurrentMap<Subscriber, BlockingQueue<Message>> queues = new ConcurrentHashMap<>();
+	private LinkedList<Subscriber> broadcastPool = new LinkedList<>();
 
 	//Constructor:
 	private MessageBrokerImpl(){};
@@ -33,7 +38,7 @@ public class MessageBrokerImpl implements MessageBroker {
 			eventsPool.get(type.getClass().getName()).add(m);
 		}
 		else{
-			ArrayList tmp = new ArrayList<Subscriber>();
+			ConcurrentLinkedQueue tmp = new ConcurrentLinkedQueue<Subscriber>();
 			tmp.add(m);
 			eventsPool.put(type.getClass().getName(),tmp);
 		}
@@ -42,48 +47,49 @@ public class MessageBrokerImpl implements MessageBroker {
 
 	@Override
 	public void subscribeBroadcast(Class<? extends Broadcast> type, Subscriber m) {
-		// TODO Auto-generated method stub
+		broadcastPool.addLast(m);
 
 	}
 
 	@Override
 	public <T> void complete(Event<T> e, T result) {
-		// TODO Auto-generated method stub
+		futures.get(e).resolve(result);
 
 	}
 
 	@Override
 	public void sendBroadcast(Broadcast b) {
-		// TODO Auto-generated method stub
+		for (Subscriber sub: broadcastPool){
+			sub.addMessage(b);
+		}
 
 	}
 
-	
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
-		ArrayList<Subscriber> pool =  eventsPool.get(e.getClass().getName());
+		ConcurrentLinkedQueue<Subscriber> pool =  eventsPool.get(e.getClass().getName());
 		if (pool==null){
-			pool = new ArrayList<Subscriber>();
+			pool = new ConcurrentLinkedQueue<Subscriber>();
 			eventsPool.put(e.getClass().getName(),pool);
 		}
-		else{
-			for (Subscriber sub:pool) {
-				sub.addEvent(e);
-			}
+		Future<T> future = new Future<>();
+		futures.put(e,future);
+		Subscriber sub = pool.poll();
+		sub.addMessage(e);
+		pool.add(sub);
+		return future;
 		}
-		return null;
-	}
+
 
 	@Override
 	public void register(Subscriber m) {
-		allSubPubs.addLast(m);
-		m.makeQueue();
-
+		BlockingQueue<Message> queue = new LinkedBlockingQueue<>();
+		queues.put(m,queue);
 	}
 
 	@Override
 	public void unregister(Subscriber m) {
-		// TODO Auto-generated method stub
+		queues.remove(m,queues.get(m));
 
 	}
 
