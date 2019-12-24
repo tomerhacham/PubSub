@@ -67,22 +67,31 @@ public class MessageBrokerImpl implements MessageBroker {
 
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
+		Future<T> future = null;
 		Queue<Subscriber> pool =  eventsPool.get(e.getClass().getName());
 		if (pool==null){
-			pool = new LinkedList<Subscriber>();
-			eventsPool.put(e.getClass().getName(),pool);
+			//System.out.println("No Subscriber has registered to handle ExampleEvent events! The event cannot be\n" +
+			//		"processed\n");
+			//pool = new LinkedList<Subscriber>();
+			//eventsPool.put(e.getClass().getName(),pool);
 		}
-		Future<T> future = new Future<>();
-		futures.put(e,future);
-		Subscriber sub = pool.poll();
-		try {
-			queues.get(sub).put(e);
-		} catch (InterruptedException ex) {
-			ex.printStackTrace();
+		else{
+			Subscriber sub = pool.poll();
+			if(sub==null){
+				System.out.println("Subscriber did not register to MessageBroker");
+			}
+			else{
+				future=new Future<>();
+				futures.put(e,future);
+				try {
+					queues.get(sub).put(e);
+				} catch (InterruptedException ex) {
+					ex.printStackTrace();
+				}
+			}
 		}
-		pool.add(sub);
 		return future;
-		}
+	}
 
 
 	@Override
