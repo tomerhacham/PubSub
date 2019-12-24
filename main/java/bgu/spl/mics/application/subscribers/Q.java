@@ -1,6 +1,10 @@
 package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.Subscriber;
+import bgu.spl.mics.application.messages.GadgetAvailableEvent;
+import bgu.spl.mics.application.messages.MissionReceivedEvent;
+import bgu.spl.mics.application.messages.TickBroadcast;
+import bgu.spl.mics.application.passiveObjects.Inventory;
 
 /**
  * Q is the only Subscriber\Publisher that has access to the {@link bgu.spl.mics.application.passiveObjects.Inventory}.
@@ -9,16 +13,32 @@ import bgu.spl.mics.Subscriber;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class Q extends Subscriber {
+	//Fields:
+	Inventory inventory;
+	int tick = 0;
 
 	public Q() {
-		super("Change_This_Name");
-		// TODO Implement this
+		super("Q");
+		this.inventory = Inventory.getInstance();
 	}
 
 	@Override
 	protected void initialize() {
-		// TODO Implement this
-		
-	}
+		subscribeBroadcast(TickBroadcast.class, br -> {
+			if (br.isTermminate()) {
+				terminate();
+			}
+			if (br.getTickNum() >= 0) {
+				tick = br.getTickNum();
+			}
+		});
+		subscribeEvent(GadgetAvailableEvent.class,check ->{
+			String requested_gadget=check.getRequested_gadget();
+			if(inventory.getItem(requested_gadget)){
+				check.getFuture().resolve(requested_gadget);
+				}
+			//TODO: what happend if the gadget is not available
+		});
 
+	}
 }
