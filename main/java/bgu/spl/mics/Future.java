@@ -17,7 +17,6 @@ public class Future<T> {
 	 * This should be the the only public constructor in this class.
 	 */
 	public Future() {
-		//TODO: implement this
 	}
 	
 	/**
@@ -43,8 +42,10 @@ public class Future<T> {
      * @return true if this object has been resolved, false otherwise
      */
 	public boolean isDone() {
-		//TODO: implement this.
-		return false;
+		if(this.result==null){
+			return false;
+		}
+		else return true;
 	}
 	
 	/**
@@ -59,8 +60,15 @@ public class Future<T> {
      *         elapsed, return null.
      */
 	public T get(long timeout, TimeUnit unit) {
-		//TODO: implement this.
-		return null;
+		while (!isDone()){
+			try {
+				wait(TimeUnit.MILLISECONDS.convert(timeout, unit));
+			}
+			catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
 	}
 
 }
