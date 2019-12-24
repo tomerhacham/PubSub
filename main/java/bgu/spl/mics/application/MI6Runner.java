@@ -43,16 +43,18 @@ public class MI6Runner {
 
         //MessageBroker messageBroker = MessageBrokerImpl.getInstance();
 
-        //Create M and Moneypenny
         JSONObject services = (JSONObject) json.get("services");
-        Long Moneypenny =(Long)services.get("Moneypenny");
-        Long M = (Long)services.get("M");
-        for(int i=0;i<Moneypenny;i++){Moneypenny moneypenny= new Moneypenny(i+1);}
-        for(int i=0;i<M;i++){M m= new M(i+1);}
-
         //Create TimeService
         Long time = (Long) services.get("time");
         TimeService timeService = new TimeService(time.intValue());
+
+        //Create M and Moneypenny
+
+        Long Moneypenny =(Long)services.get("Moneypenny");
+        Long M = (Long)services.get("M");
+        for(int i=0;i<Moneypenny;i++){Moneypenny moneypenny= new Moneypenny(i+1);}
+        for(int i=0;i<M;i++){M m= new M(i+1,time.intValue());}
+
 
         //Create all intelligence sources
         JSONArray intelligence = (JSONArray) services.get("intelligence");

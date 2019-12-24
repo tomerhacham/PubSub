@@ -4,10 +4,10 @@ import bgu.spl.mics.Event;
 import bgu.spl.mics.Future;
 import bgu.spl.mics.Message;
 
-public class GadgetAvailableEvent implements Event<String> {
+public class GadgetAvailableEvent implements Event<Integer> {
     //fields:
     String requested_gadget;
-    Future<String> future = new Future<>();
+    Future<Integer> future = new Future<>();
 
     //constructor:
     public GadgetAvailableEvent(String gadget)
@@ -16,7 +16,7 @@ public class GadgetAvailableEvent implements Event<String> {
 
 
     public String getRequested_gadget() {return requested_gadget;}
-    public Future<String> getFuture(){
+    public Future<Integer> getFuture(){
         return this.future;
     }
 
