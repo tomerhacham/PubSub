@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.Thread.sleep;
+
 /**
  * Passive data-object representing a information about an agent in MI6.
  * You must not alter any of the given public methods of this class. 
@@ -62,7 +64,15 @@ public class Squad {
 	 * @param time   milliseconds to sleep
 	 */
 	public void sendAgents(List<String> serials, int time){
-		// TODO Implement this
+		try {
+			sleep(time);
+			for (String serial: serials){
+				Agent agent= agents.get(serial);
+				agent.release();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -71,19 +81,23 @@ public class Squad {
 	 * @return ‘false’ if an agent of serialNumber ‘serial’ is missing, and ‘true’ otherwise
 	 */
 	public boolean getAgents(List<String> serials){
-		boolean flag=true;
 		for (String serial: serials){
 			if(!agents.containsKey(serial)){
-				flag= false;
+				return false;
 			}
 		}
-		if(flag){
 			for (String serial: serials){
-				agents.get(serial).acquire();
+				Agent agent= agents.get(serial);
+				while (!agent.isAvailable()){
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				agent.acquire();
 			}
-		}
-		// TODO Implement this
-		return flag;
+			return true;
 	}
 
     /**

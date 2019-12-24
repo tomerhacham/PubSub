@@ -3,7 +3,9 @@ package bgu.spl.mics.application.subscribers;
 import bgu.spl.mics.Future;
 import bgu.spl.mics.Subscriber;
 import bgu.spl.mics.application.messages.*;
+import bgu.spl.mics.application.passiveObjects.Diary;
 import bgu.spl.mics.application.passiveObjects.MissionInfo;
+import bgu.spl.mics.application.passiveObjects.Report;
 
 import java.util.List;
 
@@ -17,7 +19,7 @@ public class M extends Subscriber {
 
 	//Fields:
 	private Integer id;
-	private int tick;
+	private int tickM;
 	private int duration;
 
 	//Constructor:
@@ -29,11 +31,13 @@ public class M extends Subscriber {
 
 	@Override
 	protected void initialize() {
+		Diary diary= Diary.getInstance();
+		diary.increment();
 		subscribeBroadcast(TickBroadcast.class , br -> {
 			if (br.isTermminate())
 			{ terminate(); }
 			if(br.getTickNum()>=0){
-				tick=br.getTickNum();
+				tickM=br.getTickNum();
 				}
 		});
 
@@ -42,15 +46,27 @@ public class M extends Subscriber {
 			Future<Integer> FutureQ = getSimplePublisher().sendEvent(getGadet);
 			if(FutureQ.get()!=-1){
 				AgentsAvailableEvent getAgents = new AgentsAvailableEvent(income_mission.getMissionInfo().getSerialAgentsNumbers());
-				Future<List<String>> FutureMP = getSimplePublisher().sendEvent(getAgents);
+				Future<Integer> FutureMP = getSimplePublisher().sendEvent(getAgents);
 				MissionInfo missionInfo = income_mission.getMissionInfo();
 				if(FutureMP!=null){
-					if(missionInfo.getTimeIssued()==tick && tick+missionInfo.getDuration()<=duration){
-						SendAgentsEvent ExecuteMission = new SendAgentsEvent(FutureMP.get());
+					if(missionInfo.getTimeIssued()==tickM && tickM+missionInfo.getDuration()<=duration){
+						SendAgentsEvent ExecuteMission = new SendAgentsEvent(missionInfo.getSerialAgentsNumbers(),missionInfo.getDuration());
 						Future<List<String>> agentsNames = getSimplePublisher().sendEvent(ExecuteMission);
 						if(agentsNames!=null){
-
+							Report report= new Report();
+							report.setMissionName(missionInfo.getMissionName());
+							report.setM(this.id);
+							report.setMoneypenny(FutureMP.get());
+							report.setAgentsSerialNumbersNumber(missionInfo.getSerialAgentsNumbers());
+							report.setAgentsNames(agentsNames.get());
+							report.setTimeIssued(missionInfo.getTimeIssued());
+							report.setQTime(FutureQ.get());
+							report.setTimeCreated(tickM);
+							diary.addReport(report);
 						}
+					}
+					else {
+						RecallAgentsEvent MissionFail= new RecallAgentsEvent(missionInfo.getSerialAgentsNumbers());
 					}
 				}
 			}

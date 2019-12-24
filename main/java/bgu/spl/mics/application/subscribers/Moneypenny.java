@@ -12,6 +12,7 @@ import bgu.spl.mics.Subscriber;
 public class Moneypenny extends Subscriber {
 	//Fields:
 	private Integer id;
+	int tickMP;
 
 	//Constructor:
 	public Moneypenny(int id) {
@@ -21,6 +22,7 @@ public class Moneypenny extends Subscriber {
 
 	@Override
 	protected void initialize() {
+
 		// TODO Implement this
 		
 	}

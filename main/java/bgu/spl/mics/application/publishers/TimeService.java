@@ -24,34 +24,31 @@ public class TimeService extends Publisher {
 
 	public TimeService(int duration) {
 		super("TimeService");
-		this.duration=duration;
-		this.tick=0;
+		this.duration = duration;
+		this.tick = 1;
 		timer = new Timer();
 	}
 
 	@Override
-	protected void initialize() {}
+	protected void initialize() {
+	}
 
 	@Override
 	public void run() {
-		tick++;
-		System.out.println("Sender " + getName() + " publish a broadcast");
-		SimplePublisher simplePublisher = this.getSimplePublisher();
-		TimerTask ticker = new TimerTask() {
-			public void run() {
-				TickBroadcast broadcast = new TickBroadcast(tick);
-				if (tick == duration) {
-					broadcast.setTermminate(true);
+		while (tick <= duration) {
+			System.out.println("Sender " + getName() + " publish a broadcast");
+			SimplePublisher simplePublisher = this.getSimplePublisher();
+			TimerTask ticker = new TimerTask() {
+				public void run() {
+					TickBroadcast broadcast = new TickBroadcast(tick);
+					if (tick == duration) {
+						broadcast.setTermminate(true);
+					}
+
+					simplePublisher.sendBroadcast(broadcast);
 				}
-				else if(tick>duration){
-					terminate();
-				}
-				simplePublisher.sendBroadcast(broadcast);
-			}
-		};
-		timer.scheduleAtFixedRate(ticker,0,100);
-	}
-	private void terminate(){
-		//TODO: implement
+			};
+			timer.scheduleAtFixedRate(ticker, 0, 100);
 		}
+	}
 }

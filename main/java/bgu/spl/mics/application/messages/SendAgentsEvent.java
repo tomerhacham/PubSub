@@ -7,8 +7,9 @@ import java.util.List;
     public class SendAgentsEvent implements Event{
         //fields:
         private List<String> serialAgentsNumbers;
+        int duration;
         //constructors:
-        public SendAgentsEvent(List<String> serialAgentsNumbers){
+        public SendAgentsEvent(List<String> serialAgentsNumbers, int duration){
             this.serialAgentsNumbers=serialAgentsNumbers;
         }
         //methods:
