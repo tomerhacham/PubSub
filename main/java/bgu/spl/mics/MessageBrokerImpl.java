@@ -1,7 +1,4 @@
 package bgu.spl.mics;
-
-import jdk.nashorn.internal.ir.Block;
-
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -14,9 +11,9 @@ import java.util.concurrent.*;
 public class MessageBrokerImpl implements MessageBroker {
 	//Fields:
 	private static MessageBrokerImpl messageBroker=null;
-	private ConcurrentMap<String, ConcurrentLinkedQueue> eventsPool = new ConcurrentHashMap<>();
+	private ConcurrentMap<String, Queue<Subscriber>> eventsPool = new ConcurrentHashMap<>();
 	private ConcurrentMap<Event,Future> futures = new ConcurrentHashMap<>();
-	private ConcurrentMap<Subscriber, BlockingQueue<Message>> queues = new ConcurrentHashMap<>();
+	private ConcurrentMap<Subscriber, LinkedBlockingQueue<Message>> queues = new ConcurrentHashMap<>();
 	private LinkedList<Subscriber> broadcastPool = new LinkedList<>();
 
 	//Constructor:
@@ -38,9 +35,9 @@ public class MessageBrokerImpl implements MessageBroker {
 			eventsPool.get(type.getClass().getName()).add(m);
 		}
 		else{
-			ConcurrentLinkedQueue tmp = new ConcurrentLinkedQueue<Subscriber>();
-			tmp.add(m);
-			eventsPool.put(type.getClass().getName(),tmp);
+			Queue<Subscriber> subscriberspool = new LinkedList<>();
+			subscriberspool.add(m);
+			eventsPool.put(type.getClass().getName(),subscriberspool);
 		}
 
 	}
@@ -59,23 +56,30 @@ public class MessageBrokerImpl implements MessageBroker {
 
 	@Override
 	public void sendBroadcast(Broadcast b) {
-		for (Subscriber sub: broadcastPool){
-			sub.addMessage(b);
+		for (Subscriber sub : broadcastPool) {
+			try {
+				queues.get(sub).put(b);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
-
 	}
 
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
-		ConcurrentLinkedQueue<Subscriber> pool =  eventsPool.get(e.getClass().getName());
+		Queue<Subscriber> pool =  eventsPool.get(e.getClass().getName());
 		if (pool==null){
-			pool = new ConcurrentLinkedQueue<Subscriber>();
+			pool = new LinkedList<Subscriber>();
 			eventsPool.put(e.getClass().getName(),pool);
 		}
 		Future<T> future = new Future<>();
 		futures.put(e,future);
 		Subscriber sub = pool.poll();
-		sub.addMessage(e);
+		try {
+			queues.get(sub).put(e);
+		} catch (InterruptedException ex) {
+			ex.printStackTrace();
+		}
 		pool.add(sub);
 		return future;
 		}
@@ -83,7 +87,7 @@ public class MessageBrokerImpl implements MessageBroker {
 
 	@Override
 	public void register(Subscriber m) {
-		BlockingQueue<Message> queue = new LinkedBlockingQueue<>();
+		LinkedBlockingQueue<Message> queue = new LinkedBlockingQueue<>();
 		queues.put(m,queue);
 	}
 
@@ -95,8 +99,9 @@ public class MessageBrokerImpl implements MessageBroker {
 
 	@Override
 	public Message awaitMessage(Subscriber m) throws InterruptedException {
-		// TODO Auto-generated method stub
-		return null;
+		BlockingQueue<Message> queue = queues.get(m);
+		Message message = queue.take();
+		return message;
 	}
 
 	
