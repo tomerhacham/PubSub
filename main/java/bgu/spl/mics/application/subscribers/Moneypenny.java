@@ -14,9 +14,9 @@ public class Moneypenny extends Subscriber {
 	private Integer id;
 
 	//Constructor:
-	public Moneypenny() {
-		super("Change_This_Name");
-		// TODO Implement this
+	public Moneypenny(int id) {
+		super("Moneypenny");
+		this.id=id;
 	}
 
 	@Override

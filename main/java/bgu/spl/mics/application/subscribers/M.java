@@ -14,9 +14,9 @@ public class M extends Subscriber {
 	private Integer id;
 
 	//Constructor:
-	public M() {
-		super("Change_This_Name");
-		// TODO Implement this
+	public M(int id) {
+		super("M");
+		this.id=id;
 	}
 
 	@Override
