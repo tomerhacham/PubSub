@@ -44,33 +44,38 @@ public class M extends Subscriber {
 		subscribeEvent(MissionReceivedEvent.class, income_mission->{
 			GadgetAvailableEvent getGadet = new GadgetAvailableEvent(income_mission.getMissionInfo().getGadget());
 			Future<Integer> FutureQ = getSimplePublisher().sendEvent(getGadet);
-			if(FutureQ.get()!=-1){
+			if(FutureQ.get()!=-1) {
 				AgentsAvailableEvent getAgents = new AgentsAvailableEvent(income_mission.getMissionInfo().getSerialAgentsNumbers());
 				Future<Integer> FutureMP = getSimplePublisher().sendEvent(getAgents);
 				MissionInfo missionInfo = income_mission.getMissionInfo();
-				if(FutureMP!=null){
 
-					boolean missioncomplete= false;
+				if (FutureMP != null) {
 
-					if(missionInfo.getTimeIssued()==tickM ){
-						missioncomplete= true;
-						SendAgentsEvent ExecuteMission = new SendAgentsEvent(missionInfo.getSerialAgentsNumbers(),missionInfo.getDuration());
-						Future<List<String>> agentsNames = getSimplePublisher().sendEvent(ExecuteMission);
-						if(agentsNames!=null){
-							Report report= new Report();
+					boolean missioncomplete = false;
+
+					if (tickM < missionInfo.getTimeExpired()) {
+
+						missioncomplete = true;
+						SendAgentsEvent sendAgents = new SendAgentsEvent(income_mission.getMissionInfo().getSerialAgentsNumbers(), missionInfo.getDuration());
+						Future<List<String>> agentsName = getSimplePublisher().sendEvent(sendAgents);
+						if (agentsName.get() != null) {
+
+							Report report = new Report();
+
 							report.setMissionName(missionInfo.getMissionName());
 							report.setM(this.id);
 							report.setMoneypenny(FutureMP.get());
 							report.setAgentsSerialNumbersNumber(missionInfo.getSerialAgentsNumbers());
-							report.setAgentsNames(agentsNames.get());
+							report.setAgentsNames(agentsName.get());
 							report.setTimeIssued(missionInfo.getTimeIssued());
 							report.setQTime(FutureQ.get());
 							report.setTimeCreated(tickM);
 							diary.addReport(report);
 						}
+
 					}
-					if(missioncomplete && tickM+missionInfo.getDuration()<=duration){
-						RecallAgentsEvent MissionFail= new RecallAgentsEvent(missionInfo.getSerialAgentsNumbers());
+					if (missioncomplete && missionInfo.getDuration() + tickM > duration) {
+						RecallAgentsEvent MissionFail = new RecallAgentsEvent(missionInfo.getSerialAgentsNumbers());
 					}
 				}
 			}

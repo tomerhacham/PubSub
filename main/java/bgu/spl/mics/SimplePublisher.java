@@ -1,5 +1,7 @@
 package bgu.spl.mics;
 
+import bgu.spl.mics.MessageBroker;
+
 /**
  * The SimplePublisher is a class that any publisher in the system
  * stores. The SimplePublisher class is responsible to send

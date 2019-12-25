@@ -1,6 +1,15 @@
 package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.Subscriber;
+import bgu.spl.mics.application.messages.AgentsAvailableEvent;
+import bgu.spl.mics.application.messages.RecallAgentsEvent;
+import bgu.spl.mics.application.messages.SendAgentsEvent;
+import bgu.spl.mics.application.messages.TickBroadcast;
+import bgu.spl.mics.application.passiveObjects.Agent;
+import bgu.spl.mics.application.passiveObjects.Squad;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Only this type of Subscriber can access the squad.
@@ -13,18 +22,43 @@ public class Moneypenny extends Subscriber {
 	//Fields:
 	private Integer id;
 	int tickMP;
+	Squad squad = Squad.getInstance();
 
 	//Constructor:
 	public Moneypenny(int id) {
 		super("Moneypenny");
-		this.id=id;
+		this.id = id;
 	}
 
 	@Override
 	protected void initialize() {
+		subscribeBroadcast(TickBroadcast.class, br -> {
+			if (br.isTermminate()) {
+				terminate();
+			}
+			if (br.getTickNum() >= 0) {
+				tickMP = br.getTickNum();
+			}
+		});
+		subscribeEvent(AgentsAvailableEvent.class, Get_Agents -> {
+			List<String> serials= Get_Agents.getSerialAgentsNumbers();
+			if (squad.getAgents(serials)) {
+				complete(Get_Agents, id);
+			} else {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		subscribeEvent(RecallAgentsEvent.class, Release_agents -> {
+			squad.releaseAgents(Release_agents.GetSerialAgentsNumbers());
+			complete(Release_agents, true);
+		});
 
-		// TODO Implement this
-		
 	}
-
 }
+
+
+
