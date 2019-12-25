@@ -26,7 +26,7 @@ public class Moneypenny extends Subscriber {
 
 	//Constructor:
 	public Moneypenny(int id) {
-		super("Moneypenny");
+		super("Moneypenny "+id);
 		this.id = id;
 	}
 
@@ -44,17 +44,16 @@ public class Moneypenny extends Subscriber {
 			List<String> serials= Get_Agents.getSerialAgentsNumbers();
 			if (squad.getAgents(serials)) {
 				complete(Get_Agents, id);
-			} else {
-				try {
-					wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
 			}
 		});
 		subscribeEvent(RecallAgentsEvent.class, Release_agents -> {
 			squad.releaseAgents(Release_agents.GetSerialAgentsNumbers());
 			complete(Release_agents, true);
+		});
+
+		subscribeEvent(SendAgentsEvent.class, Send_agents-> {
+			squad.releaseAgents(Send_agents.GetSerialAgentsNumbers());
+			complete(Send_agents, squad.getAgentsNames(Send_agents.GetSerialAgentsNumbers()));
 		});
 
 	}

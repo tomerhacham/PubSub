@@ -24,7 +24,7 @@ public class M extends Subscriber {
 
 	//Constructor:
 	public M(int id,int duration) {
-		super("M");
+		super("M"+id);
 		this.id=id;
 		this.duration=duration;
 	}
