@@ -60,7 +60,7 @@ public abstract class Subscriber extends RunnableSubPub {
      *                 queue.
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
-        callbackMap.put(type.getClass(), callback);
+        callbackMap.put(type, callback);
         messageBroker.subscribeEvent(type, this);
     }
 
@@ -86,7 +86,7 @@ public abstract class Subscriber extends RunnableSubPub {
      *                 queue.
      */
     protected final <B extends Broadcast> void subscribeBroadcast(Class<B> type, Callback<B> callback) {
-        callbackMap.put(type.getClass(), callback);
+        callbackMap.put(type, callback);
         messageBroker.subscribeBroadcast(type, this);
     }
 
@@ -133,6 +133,6 @@ public abstract class Subscriber extends RunnableSubPub {
                 callbackMap.get(message.getClass()).call(message);
             }
         }
-        messageBroker.unregister(this);
+        if(terminated){messageBroker.unregister(this);}
     }
 }

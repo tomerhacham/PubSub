@@ -22,7 +22,6 @@ public class ExampleManager {
             System.out.println("Example manager is started - supported commands are: start,quit");
             System.out.println("Supporting apps: " + creators.keySet());
             while (!quit) {
-
                 String line = sc.nextLine();
                 String[] params = line.split("\\s+");
 

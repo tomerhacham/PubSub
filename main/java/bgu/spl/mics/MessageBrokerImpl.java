@@ -11,10 +11,10 @@ import java.util.concurrent.*;
 public class MessageBrokerImpl implements MessageBroker {
 	//Fields:
 	private static MessageBrokerImpl messageBroker=null;
-	private ConcurrentMap<String, Queue<Subscriber>> eventsPool = new ConcurrentHashMap<>();
+	private ConcurrentMap<Class<? extends Message>, ConcurrentLinkedQueue<Subscriber>> eventsPool = new ConcurrentHashMap<>();
 	private ConcurrentMap<Event,Future> futures = new ConcurrentHashMap<>();
 	private ConcurrentMap<Subscriber, LinkedBlockingQueue<Message>> queues = new ConcurrentHashMap<>();
-	private LinkedList<Subscriber> broadcastPool = new LinkedList<>();
+	//private LinkedList<Subscriber> broadcastPool = new LinkedList<>();
 
 	//Constructor:
 	private MessageBrokerImpl(){};
@@ -22,7 +22,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	/**
 	 * Retrieves the single instance of this class.
 	 */
-	public static MessageBrokerImpl getInstance() {
+	public synchronized static MessageBrokerImpl getInstance() {
 		if(messageBroker==null){
 			messageBroker=new MessageBrokerImpl();
 			}
@@ -31,36 +31,50 @@ public class MessageBrokerImpl implements MessageBroker {
 
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, Subscriber m) {
-		if(eventsPool.get(type.getClass().getName())!= null){
-			eventsPool.get(type.getClass().getName()).add(m);
+		if(eventsPool.get(type)!= null){
+			eventsPool.get(type).add(m);
 		}
 		else{
-			Queue<Subscriber> subscriberspool = new LinkedList<>();
+			ConcurrentLinkedQueue<Subscriber> subscriberspool = new ConcurrentLinkedQueue<>();
 			subscriberspool.add(m);
-			eventsPool.put(type.getClass().getName(),subscriberspool);
+			eventsPool.put(type,subscriberspool);
 		}
 
 	}
 
 	@Override
 	public void subscribeBroadcast(Class<? extends Broadcast> type, Subscriber m) {
-		broadcastPool.addLast(m);
-
+		if(eventsPool.get(type)!= null){
+			eventsPool.get(type).add(m);
+		}
+		else{
+			ConcurrentLinkedQueue<Subscriber> subscriberspool = new ConcurrentLinkedQueue<>();
+			subscriberspool.add(m);
+			eventsPool.put(type,subscriberspool);
+		}
 	}
 
 	@Override
 	public <T> void complete(Event<T> e, T result) {
-		futures.get(e).resolve(result);
+		if(e!=null && futures.get(e)!=null){
+			futures.get(e).resolve(result);
+		}
 
 	}
 
 	@Override
 	public void sendBroadcast(Broadcast b) {
-		for (Subscriber sub : broadcastPool) {
-			try {
-				queues.get(sub).put(b);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		ConcurrentLinkedQueue<Subscriber> subscriberQueue = eventsPool.get(b.getClass());
+		if(subscriberQueue!=null) {
+			for(int i=0; i< subscriberQueue.size(); i++){
+				Subscriber sub = subscriberQueue.poll();
+				 BlockingQueue queue = queues.get(sub);
+				try {
+					queue.put(b);
+					subscriberQueue.add(sub);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -68,23 +82,19 @@ public class MessageBrokerImpl implements MessageBroker {
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
 		Future<T> future = null;
-		Queue<Subscriber> pool =  eventsPool.get(e.getClass().getName());
-		if (pool==null){
-			//System.out.println("No Subscriber has registered to handle ExampleEvent events! The event cannot be\n" +
-			//		"processed\n");
-			//pool = new LinkedList<Subscriber>();
-			//eventsPool.put(e.getClass().getName(),pool);
-		}
-		else{
-			Subscriber sub = pool.poll();
-			if(sub==null){
-				System.out.println("Subscriber did not register to MessageBroker");
-			}
-			else{
+		ConcurrentLinkedQueue<Subscriber> pool =  eventsPool.get(e.getClass());
+		if (pool!=null){
+			if(!pool.isEmpty()) {
+				Subscriber sub = pool.poll();
+				pool.add(sub);
 				future=new Future<>();
 				futures.put(e,future);
 				try {
-					queues.get(sub).put(e);
+					LinkedBlockingQueue queue = queues.get(sub);
+					if(queue==null){
+						register(sub);
+					}
+					queue.put(e);
 				} catch (InterruptedException ex) {
 					ex.printStackTrace();
 				}
@@ -102,15 +112,20 @@ public class MessageBrokerImpl implements MessageBroker {
 
 	@Override
 	public void unregister(Subscriber m) {
-		queues.remove(m,queues.get(m));
+		if(queues.keySet().contains(m)){
+			queues.remove(m,queues.get(m));
+			for (Class<? extends Message> type: eventsPool.keySet()){
+					ConcurrentLinkedQueue  pool = eventsPool.get(type);
+					while(pool.contains(m)){pool.remove(m);}
+				}
+			}
 
 	}
 
 	@Override
 	public Message awaitMessage(Subscriber m) throws InterruptedException {
-		BlockingQueue<Message> queue = queues.get(m);
-		Message message = queue.take();
-		return message;
+		LinkedBlockingQueue<Message> queue = queues.get(m);
+		return queue.take();
 	}
 
 	

@@ -11,11 +11,11 @@ package bgu.spl.mics;
  */
 public final class SimplePublisher {
     //Fields:
-    MessageBroker messageBroker;
+    private MessageBroker messageBroker;
 
     //Constructor:
     public SimplePublisher(){
-        this.messageBroker = MessageBrokerImpl.getInstance();
+        messageBroker = MessageBrokerImpl.getInstance();
     }
     /**
      * Sends the event {@code e} using the MessageBroker and receive a {@link Future<T>}
