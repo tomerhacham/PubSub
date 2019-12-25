@@ -49,7 +49,11 @@ public class M extends Subscriber {
 				Future<Integer> FutureMP = getSimplePublisher().sendEvent(getAgents);
 				MissionInfo missionInfo = income_mission.getMissionInfo();
 				if(FutureMP!=null){
-					if(missionInfo.getTimeIssued()==tickM && tickM+missionInfo.getDuration()<=duration){
+
+					boolean missioncomplete= false;
+
+					if(missionInfo.getTimeIssued()==tickM ){
+						missioncomplete= true;
 						SendAgentsEvent ExecuteMission = new SendAgentsEvent(missionInfo.getSerialAgentsNumbers(),missionInfo.getDuration());
 						Future<List<String>> agentsNames = getSimplePublisher().sendEvent(ExecuteMission);
 						if(agentsNames!=null){
@@ -65,7 +69,7 @@ public class M extends Subscriber {
 							diary.addReport(report);
 						}
 					}
-					else {
+					if(missioncomplete && tickM+missionInfo.getDuration()<=duration){
 						RecallAgentsEvent MissionFail= new RecallAgentsEvent(missionInfo.getSerialAgentsNumbers());
 					}
 				}
