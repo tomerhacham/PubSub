@@ -1,5 +1,10 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,7 +61,25 @@ public class Diary {
 	 * This method is called by the main method in order to generate the output.
 	 */
 	public void printToFile(String filename){
-		//TODO: Implement this
+		JSONArray reportDetails = new JSONArray();
+		reportDetails.addAll(reports);
+		JSONObject reports = new JSONObject();
+		reports.put("reports",reportDetails);
+		JSONObject total = new JSONObject();
+		total.put("total",total);
+		JSONArray Diary = new JSONArray();
+		Diary.add(reports);
+		Diary.add(total);
+
+		//Write JSON file
+		try (FileWriter file = new FileWriter(filename+".json")) {
+
+			file.write(Diary.toJSONString());
+			file.flush();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
