@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import bgu.spl.mics.MessageBroker;
 import bgu.spl.mics.application.passiveObjects.Agent;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 import bgu.spl.mics.application.passiveObjects.MissionInfo;
@@ -14,7 +13,6 @@ import bgu.spl.mics.application.publishers.TimeService;
 import bgu.spl.mics.application.subscribers.Intelligence;
 import bgu.spl.mics.application.subscribers.Moneypenny;
 import bgu.spl.mics.application.subscribers.M;
-import com.google.gson.JsonObject;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.*;
@@ -25,6 +23,7 @@ import org.json.simple.parser.*;
  */
 public class MI6Runner {
     public static void main(String[] args) {
+        List<Thread> threads = new LinkedList<Thread>();
 
         Object obj = null;
         try {
@@ -40,29 +39,40 @@ public class MI6Runner {
 
         //Create Inventory
         Inventory.getInstance().load(s);
-
-        //MessageBroker messageBroker = MessageBrokerImpl.getInstance();
+        Inventory.getInstance().printToFile("inventory");
 
         JSONObject services = (JSONObject) json.get("services");
         //Create TimeService
         Long time = (Long) services.get("time");
         TimeService timeService = new TimeService(time.intValue());
+        Thread time_service_thread = new Thread(timeService);
+        threads.add(time_service_thread);
 
         //Create M and Moneypenny
-
         Long Moneypenny =(Long)services.get("Moneypenny");
         Long M = (Long)services.get("M");
-        for(int i=0;i<Moneypenny;i++){Moneypenny moneypenny= new Moneypenny(i+1);}
-        for(int i=0;i<M;i++){M m= new M(i+1,time.intValue());}
+        for(int i=0;i<Moneypenny;i++){
+            Moneypenny moneypenny= new Moneypenny(i+1);
+            Thread moneypenny_thread = new Thread(moneypenny);
+            threads.add(moneypenny_thread);
+        }
+
+        for(int i=0;i<M;i++){
+            M m= new M(i+1,time.intValue());
+            Thread m_thread = new Thread(m);
+            threads.add(m_thread);
+        }
 
 
         //Create all intelligence sources
         JSONArray intelligence = (JSONArray) services.get("intelligence");
-        List<Intelligence> IntelSources = new LinkedList<>();
+        //List<Intelligence> IntelSources = new LinkedList<>();
         for (Object _intelsource:intelligence ) {
             JSONObject intelsource = (JSONObject)_intelsource;
             JSONArray missions = (JSONArray) intelsource.get("missions");
-            IntelSources.add(new Intelligence(MI6Runner.createMissions(missions)));
+            Intelligence intelligence1 = new Intelligence(MI6Runner.createMissions(missions));
+            Thread intel_thread = new Thread(intelligence1);
+            threads.add(intel_thread);
         }
 
         //Create Squad
@@ -77,6 +87,11 @@ public class MI6Runner {
             i++;
         }
         squad.load(agents);
+
+        //Initialize all threads
+        for (Thread thread:threads) {
+            thread.run();
+        }
     }
 
     private static List<MissionInfo> createMissions(JSONArray info){
