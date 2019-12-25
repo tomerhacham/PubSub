@@ -2,6 +2,7 @@ package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.Future;
 import bgu.spl.mics.Subscriber;
+import bgu.spl.mics.application.SyncInitialize;
 import bgu.spl.mics.application.messages.*;
 import bgu.spl.mics.application.passiveObjects.Diary;
 import bgu.spl.mics.application.passiveObjects.MissionInfo;
@@ -31,6 +32,7 @@ public class M extends Subscriber {
 
 	@Override
 	protected void initialize() {
+		//SyncInitialize.getInstance().addInit();
 		Diary diary= Diary.getInstance();
 		diary.increment();
 		subscribeBroadcast(TickBroadcast.class , br -> {

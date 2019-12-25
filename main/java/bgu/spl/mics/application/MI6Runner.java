@@ -4,11 +4,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import bgu.spl.mics.application.passiveObjects.Agent;
-import bgu.spl.mics.application.passiveObjects.Inventory;
-import bgu.spl.mics.application.passiveObjects.MissionInfo;
-import bgu.spl.mics.application.passiveObjects.Squad;
+import bgu.spl.mics.application.passiveObjects.*;
 import bgu.spl.mics.application.publishers.TimeService;
 import bgu.spl.mics.application.subscribers.Intelligence;
 import bgu.spl.mics.application.subscribers.Moneypenny;
@@ -39,14 +38,14 @@ public class MI6Runner {
 
         //Create Inventory
         Inventory.getInstance().load(s);
-        Inventory.getInstance().printToFile("inventory");
 
         JSONObject services = (JSONObject) json.get("services");
         //Create TimeService
         Long time = (Long) services.get("time");
         TimeService timeService = new TimeService(time.intValue());
         Thread time_service_thread = new Thread(timeService);
-        threads.add(time_service_thread);
+        time_service_thread.setName("Time Service");
+       // threads.add(time_service_thread);
 
         //Create M and Moneypenny
         Long Moneypenny =(Long)services.get("Moneypenny");
@@ -54,12 +53,14 @@ public class MI6Runner {
         for(int i=0;i<Moneypenny;i++){
             Moneypenny moneypenny= new Moneypenny(i+1);
             Thread moneypenny_thread = new Thread(moneypenny);
+            moneypenny_thread.setName("Moneypenny "+(i+1));
             threads.add(moneypenny_thread);
         }
 
         for(int i=0;i<M;i++){
             M m= new M(i+1,time.intValue());
             Thread m_thread = new Thread(m);
+            m_thread.setName("M "+(i+1));
             threads.add(m_thread);
         }
 
@@ -67,12 +68,15 @@ public class MI6Runner {
         //Create all intelligence sources
         JSONArray intelligence = (JSONArray) services.get("intelligence");
         //List<Intelligence> IntelSources = new LinkedList<>();
+        int index=1;
         for (Object _intelsource:intelligence ) {
             JSONObject intelsource = (JSONObject)_intelsource;
             JSONArray missions = (JSONArray) intelsource.get("missions");
             Intelligence intelligence1 = new Intelligence(MI6Runner.createMissions(missions));
             Thread intel_thread = new Thread(intelligence1);
+            intel_thread.setName("intelligence "+index);
             threads.add(intel_thread);
+            index++;
         }
 
         //Create Squad
@@ -89,9 +93,45 @@ public class MI6Runner {
         squad.load(agents);
 
         //Initialize all threads
+        //SyncInitialize.getInstance().setnumberOfThreads(threads.size());
+
         for (Thread thread:threads) {
-            thread.run();
+            thread.start();
+            System.out.println(thread.getName());
         }
+        time_service_thread.start();
+        System.out.println("Start Time Service");
+
+        try {
+            Thread.currentThread().sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        try {
+            time_service_thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+/*        for (Thread thread: threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }*/
+
+        //Output to Json
+        Inventory.getInstance().printToFile("inventory");
+        Diary.getInstance().printToFile("Diary");
+
+/*        while(!SyncInitialize.getInstance().getNumberOfInitialize().equals(new AtomicInteger(threads.size()))){
+            try {
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {
+                //
+            }
+        }
+        time_service_thread.start();*/
     }
 
     private static List<MissionInfo> createMissions(JSONArray info){

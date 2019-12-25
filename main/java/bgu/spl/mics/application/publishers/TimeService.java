@@ -6,6 +6,7 @@ import bgu.spl.mics.application.messages.TickBroadcast;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 /**
  * TimeService is the global system timer There is only one instance of this Publisher.
@@ -48,7 +49,12 @@ public class TimeService extends Publisher {
 					simplePublisher.sendBroadcast(broadcast);
 				}
 			};
-			timer.scheduleAtFixedRate(ticker, 0, 100);
+			timer.scheduleAtFixedRate(ticker, 0, 1000);
+			try {
+				Thread.currentThread().sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

@@ -2,6 +2,7 @@ package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.Publisher;
 import bgu.spl.mics.Subscriber;
+import bgu.spl.mics.application.SyncInitialize;
 import bgu.spl.mics.application.messages.MissionReceivedEvent;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.passiveObjects.MissionInfo;
@@ -28,6 +29,7 @@ public class Intelligence extends Subscriber {
 
 	@Override
 	protected void initialize() {
+		//SyncInitialize.getInstance().addInit();
 		subscribeBroadcast(TickBroadcast.class , br -> {
 			if (br.isTermminate())
 			{ terminate(); }

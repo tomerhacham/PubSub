@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Passive object representing the diary where all reports are stored.
@@ -18,26 +19,24 @@ import java.util.List;
  */
 public class Diary {
 
+	private static class SingeltonHolder{
+		private static Diary instance = new Diary();
+	}
 	//Fields:
-	private static Diary diary=null;
 	private List<Report> reports; //only executed missions will be reported here
-	private int total; //total number of received missions
+	private AtomicInteger total; //total number of received missions
 	/**
 	 * Retrieves the single instance of this class.
 	 */
 	private Diary()
 	{
 		reports = new LinkedList<>();
-		total=0;
+		total=new AtomicInteger(0);
 
 	}
 
 	public static Diary getInstance() {
-		if(diary==null)
-		{
-			diary=new Diary();
-		}
-		return diary;
+		return SingeltonHolder.instance;
 	}
 
 	public List<Report> getReports() {
@@ -50,7 +49,6 @@ public class Diary {
 	 */
 	public void addReport(Report reportToAdd){
 		reports.add(reportToAdd);
-		total++;
 	}
 
 	/**
@@ -87,10 +85,11 @@ public class Diary {
 	 * @return the total number of received missions (executed / aborted) be all the M-instances.
 	 */
 	public int getTotal(){
-		return total;
+		return total.get();
 	}
 
 	public void increment() {
-		total++;
+		total.incrementAndGet();
+		;
 	}
 }

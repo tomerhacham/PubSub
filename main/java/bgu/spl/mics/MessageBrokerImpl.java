@@ -9,12 +9,15 @@ import java.util.concurrent.*;
  * Only private fields and methods can be added to this class.
  */
 public class MessageBrokerImpl implements MessageBroker {
+
+	private static class SingeltonHolder{
+		private static MessageBrokerImpl instance = new MessageBrokerImpl();
+	}
 	//Fields:
-	private static MessageBrokerImpl messageBroker=null;
 	private ConcurrentMap<Class<? extends Message>, ConcurrentLinkedQueue<Subscriber>> eventsPool = new ConcurrentHashMap<>();
 	private ConcurrentMap<Event,Future> futures = new ConcurrentHashMap<>();
 	private ConcurrentMap<Subscriber, LinkedBlockingQueue<Message>> queues = new ConcurrentHashMap<>();
-	//private LinkedList<Subscriber> broadcastPool = new LinkedList<>();
+
 
 	//Constructor:
 	private MessageBrokerImpl(){};
@@ -22,11 +25,8 @@ public class MessageBrokerImpl implements MessageBroker {
 	/**
 	 * Retrieves the single instance of this class.
 	 */
-	public synchronized static MessageBrokerImpl getInstance() {
-		if(messageBroker==null){
-			messageBroker=new MessageBrokerImpl();
-			}
-		return messageBroker;
+	public static MessageBrokerImpl getInstance() {
+		return SingeltonHolder.instance;
 	}
 
 	@Override
