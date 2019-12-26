@@ -12,6 +12,8 @@ public class GadgetAvailableEvent implements Event<Integer> {
     //constructor:
     public GadgetAvailableEvent(String gadget)
     {this.requested_gadget=gadget;}
+
+    public GadgetAvailableEvent(){};
     //methods:
 
 

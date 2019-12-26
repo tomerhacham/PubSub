@@ -10,6 +10,7 @@ public class TickBroadcast implements Broadcast {
 
     //constructors:
     public TickBroadcast(int tickNum){this.tickNum=tickNum;}
+    public TickBroadcast(){};
 
     //methods:
     public int getTickNum() {

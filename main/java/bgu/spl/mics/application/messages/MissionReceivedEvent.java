@@ -11,6 +11,7 @@ public class MissionReceivedEvent implements Event {
     public MissionReceivedEvent(MissionInfo missionInfo) {
         this.missionInfo = missionInfo;
     }
+    public MissionReceivedEvent(){};
     // methods:
     public MissionInfo getMissionInfo(){
         return this.missionInfo;

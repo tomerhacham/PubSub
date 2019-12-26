@@ -12,6 +12,7 @@ import java.util.List;
         public SendAgentsEvent(List<String> serialAgentsNumbers, int duration){
             this.serialAgentsNumbers=serialAgentsNumbers;
         }
+        public SendAgentsEvent(){};
         //methods:
         public List<String> GetSerialAgentsNumbers(){
             return this.serialAgentsNumbers;

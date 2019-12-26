@@ -12,6 +12,7 @@ public class RecallAgentsEvent implements Event {
     public RecallAgentsEvent(List<String> serialAgentsNumbers){
         this.serialAgentsNumbers=serialAgentsNumbers;
     }
+    public RecallAgentsEvent(){};
     //methods:
     public List<String> GetSerialAgentsNumbers(){
         return this.serialAgentsNumbers;
