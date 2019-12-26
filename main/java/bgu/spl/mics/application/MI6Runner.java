@@ -12,6 +12,7 @@ import bgu.spl.mics.application.publishers.TimeService;
 import bgu.spl.mics.application.subscribers.Intelligence;
 import bgu.spl.mics.application.subscribers.Moneypenny;
 import bgu.spl.mics.application.subscribers.M;
+import bgu.spl.mics.application.subscribers.Q;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.*;
@@ -43,7 +44,7 @@ public class MI6Runner {
         //endregion
 
         JSONObject services = (JSONObject) json.get("services");
-        CountDownLatch countDown = new CountDownLatch(countNumberOfThreads(services)-1);
+        CountDownLatch countDown = new CountDownLatch(countNumberOfThreads(services));
 
         //region Create TimeService
         Long time = (Long) services.get("time");
@@ -70,6 +71,13 @@ public class MI6Runner {
             threads.add(m_thread);
             runnables.add(m);
         }
+        //endregion
+
+        //region Create Q
+        Q q = new Q(countDown);
+        Thread q_thread = new Thread(q);
+        q_thread.setName("Q");
+        threads.add(q_thread);
         //endregion
 
         //region Create all intelligence sources
@@ -127,10 +135,19 @@ public class MI6Runner {
         time_service_thread.start();
         //endregion
 
+        for (Thread thread:threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         //region Output to Json
         Inventory.getInstance().printToFile("inventory");
-        //Diary.getInstance().printToFile("Diary");
+        Diary.getInstance().printToFile("Diary");
         //endregion
+        System.exit(0);
 
     }
     private static int countNumberOfThreads(JSONObject services){
@@ -151,7 +168,7 @@ public class MI6Runner {
             Long timeExpired = (Long) jsonObject.get("timeExpired");
             Long timeIssued = (Long) jsonObject.get("timeIssued");
             String gadget = (String) jsonObject.get("gadget");
-            String missionName = (String) jsonObject.get("missionName");
+            String missionName = (String) jsonObject.get("name");
             JSONArray serialsJsonArray = (JSONArray)jsonObject.get("serialAgentsNumbers");
             LinkedList<String> sn = new LinkedList<>();
             for (Object snobject:serialsJsonArray) {

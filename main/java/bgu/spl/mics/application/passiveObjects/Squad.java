@@ -53,7 +53,7 @@ public class Squad {
 	/**
 	 * Releases agents.
 	 */
-	public void releaseAgents(List<String> serials){
+	public synchronized void releaseAgents(List<String> serials){
 		for (String SerialNum:serials) {
 			this.agents.get(SerialNum).release();
 		}
@@ -93,7 +93,7 @@ public class Squad {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+						//e.printStackTrace();
 					}
 				}
 				agent.acquire();

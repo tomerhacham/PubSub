@@ -5,6 +5,7 @@ import bgu.spl.mics.application.messages.MissionReceivedEvent;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.passiveObjects.MissionInfo;
 
+import java.sql.SQLOutput;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -34,9 +35,19 @@ public class Intelligence extends Subscriber {
 			{ terminate(); }
 			if(br.getTickNum()>=0){
 				tick=br.getTickNum();
-				MissionReceivedEvent eventToSend = checkForMissionAtTick(tick);
-				if(eventToSend.getMissionInfo()!=null){
+				System.out.println(Thread.currentThread().getName()+" received broadcast at time "+tick);
+				MissionReceivedEvent eventToSend=null;
+				for (MissionInfo missioninfo:missions) {
+					if (missioninfo.getTimeIssued()==tick){
+						eventToSend = new MissionReceivedEvent(missioninfo);
+						missions.remove(missioninfo);
+						break;
+					}
+
+				}
+				if(eventToSend!=null){
 					super.getSimplePublisher().sendEvent(eventToSend);
+					System.out.println(Thread.currentThread().getName()+" sent a mission: "+ eventToSend.hashCode());
 				}
 			}
 		});

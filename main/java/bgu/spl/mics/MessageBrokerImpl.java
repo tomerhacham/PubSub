@@ -80,14 +80,16 @@ public class MessageBrokerImpl implements MessageBroker {
 	public void sendBroadcast(Broadcast b) {
 		ConcurrentLinkedQueue<Subscriber> subscriberQueue = eventsPool.get(b.getClass());
 		System.out.println("--for Broadcast:");
-		printQueue(subscriberQueue);
+		//printQueue(subscriberQueue);
 		if(subscriberQueue!=null) {
 			for(int i=0; i< subscriberQueue.size(); i++){
 				Subscriber sub = subscriberQueue.poll();
-				 BlockingQueue queue = queues.get(sub);
+				 LinkedBlockingQueue queue = queues.get(sub);
 				try {
 					queue.put(b);
 					subscriberQueue.add(sub);
+					/*System.out.println("------- Queue of "+sub.getName());;
+					PrintSubscriberQueue(queue);*/
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -99,8 +101,8 @@ public class MessageBrokerImpl implements MessageBroker {
 	public <T> Future<T> sendEvent(Event<T> e) {
 		Future<T> future = null;
 		ConcurrentLinkedQueue<Subscriber> pool =  eventsPool.get(e.getClass());
-		System.out.println("--for Event:");
-		printQueue(pool);
+		System.out.println("--Pool for Event:");
+		//printQueue(pool);
 		if (pool!=null){
 			if(!pool.isEmpty()) {
 				Subscriber sub = pool.poll();
@@ -113,6 +115,8 @@ public class MessageBrokerImpl implements MessageBroker {
 						register(sub);
 					}
 					queue.put(e);
+					/*System.out.println("------- Queue of "+sub.getName());
+					PrintSubscriberQueue(queue);*/
 				} catch (InterruptedException ex) {
 					ex.printStackTrace();
 				}
@@ -123,14 +127,14 @@ public class MessageBrokerImpl implements MessageBroker {
 
 
 	@Override
-	public synchronized void register(Subscriber m) {
+	public void register(Subscriber m) {
 		LinkedBlockingQueue<Message> queue = new LinkedBlockingQueue<>();
 		queues.put(m,queue);
 		System.out.println(m.getName()+" register");
 	}
 
 	@Override
-	public synchronized void unregister(Subscriber m) {
+	public void unregister(Subscriber m) {
 		if(queues.keySet().contains(m)){
 			queues.remove(m,queues.get(m));
 			for (Class<? extends Message> type: eventsPool.keySet()){
@@ -193,6 +197,12 @@ public class MessageBrokerImpl implements MessageBroker {
 		messages.add(tickBroadcast);
 
 		return messages;
+	}
+
+	private void PrintSubscriberQueue(LinkedBlockingQueue<Message> queue){
+		for (Message message:queue) {
+			System.out.print(message.getClass().getSimpleName()+ ", ");
+		}
 	}
 
 }

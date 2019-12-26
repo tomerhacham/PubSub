@@ -42,18 +42,25 @@ public class M extends Subscriber {
 			{ terminate(); }
 			if(br.getTickNum()>=0){
 				tickM=br.getTickNum();
-				}
+				System.out.println(Thread.currentThread().getName()+" received broadcast at time "+tickM);
+			}
 		});
 
 		subscribeEvent(MissionReceivedEvent.class, income_mission->{
+			System.out.println(Thread.currentThread().getName() + " recieved new mission: " + income_mission.hashCode());
 			GadgetAvailableEvent getGadet = new GadgetAvailableEvent(income_mission.getMissionInfo().getGadget());
 			Future<Integer> FutureQ = getSimplePublisher().sendEvent(getGadet);
+			System.out.println(Thread.currentThread().getName() + " sent gadget aviable: " + getGadet.hashCode());
 			if(FutureQ.get()!=-1) {
+				System.out.println(Thread.currentThread().getName()+ " recieve gadget from q: " + FutureQ.hashCode());
 				AgentsAvailableEvent getAgents = new AgentsAvailableEvent(income_mission.getMissionInfo().getSerialAgentsNumbers());
 				Future<Integer> FutureMP = getSimplePublisher().sendEvent(getAgents);
+				System.out.println(Thread.currentThread().getName()+ " sent agent aviable: "+ getAgents.hashCode());
 				MissionInfo missionInfo = income_mission.getMissionInfo();
 
+
 				if (FutureMP != null) {
+					System.out.println(Thread.currentThread().getName()+ "recieved agents from mp: " +FutureMP.hashCode() +":" +FutureMP.get());
 
 					boolean missioncomplete = false;
 

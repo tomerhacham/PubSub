@@ -35,9 +35,11 @@ public class Q extends Subscriber {
 			}
 			if (br.getTickNum() >= 0) {
 				tick = br.getTickNum();
+				System.out.println(Thread.currentThread().getName()+" received broadcast at time "+tick);
 			}
 		});
 		subscribeEvent(GadgetAvailableEvent.class, event ->{
+			System.out.println(Thread.currentThread().getName()+ " recieved gadget aviable: " + event.hashCode());
 			String requested_gadget=event.getRequested_gadget();
 			if(inventory.getItem(requested_gadget)){
 				complete(event,tick );

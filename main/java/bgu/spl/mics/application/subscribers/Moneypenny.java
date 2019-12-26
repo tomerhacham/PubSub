@@ -42,9 +42,11 @@ public class Moneypenny extends Subscriber {
 			}
 			if (br.getTickNum() >= 0) {
 				tickMP = br.getTickNum();
+				System.out.println(Thread.currentThread().getName()+" received broadcast at time "+tickMP);
 			}
 		});
 		subscribeEvent(AgentsAvailableEvent.class, Get_Agents -> {
+			System.out.println(Thread.currentThread().getName()+ " recieved agents aviable: "+ Get_Agents.hashCode());
 			List<String> serials= Get_Agents.getSerialAgentsNumbers();
 			if (squad.getAgents(serials)) {
 				complete(Get_Agents, id);

@@ -1,9 +1,6 @@
 package bgu.spl.mics;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -33,7 +30,7 @@ public abstract class Subscriber extends RunnableSubPub {
      */
     public Subscriber(String name) {
         super(name);
-        callbackMap = new ConcurrentHashMap<>();
+        callbackMap = new HashMap<>();
         messageBroker = MessageBrokerImpl.getInstance();
     }
 
