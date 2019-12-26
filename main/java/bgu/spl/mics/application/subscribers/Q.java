@@ -7,6 +7,8 @@ import bgu.spl.mics.application.messages.MissionReceivedEvent;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * Q is the only Subscriber\Publisher that has access to the {@link bgu.spl.mics.application.passiveObjects.Inventory}.
  *
@@ -15,17 +17,18 @@ import bgu.spl.mics.application.passiveObjects.Inventory;
  */
 public class Q extends Subscriber {
 	//Fields:
-	Inventory inventory;
-	int tick = 0;
+	private Inventory inventory;
+	private CountDownLatch countdown;
+	private int tick = 0;
 
-	public Q() {
+	public Q(CountDownLatch countdown) {
 		super("Q");
 		this.inventory = Inventory.getInstance();
+		this.countdown=countdown;
 	}
 
 	@Override
 	protected void initialize() {
-		//SyncInitialize.getInstance().addInit();
 		subscribeBroadcast(TickBroadcast.class, br -> {
 			if (br.isTermminate()) {
 				terminate();
@@ -41,5 +44,7 @@ public class Q extends Subscriber {
 				}
 			else{complete(event,-1);}
 		});
+		System.out.println("Q is UP");
+		countdown.countDown();
 	}
 }
