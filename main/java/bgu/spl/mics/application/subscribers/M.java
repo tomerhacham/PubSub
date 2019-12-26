@@ -9,6 +9,7 @@ import bgu.spl.mics.application.passiveObjects.MissionInfo;
 import bgu.spl.mics.application.passiveObjects.Report;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * M handles ReadyEvent - fills a report and sends agents to mission.
@@ -22,17 +23,18 @@ public class M extends Subscriber {
 	private Integer id;
 	private int tickM;
 	private int duration;
+	private CountDownLatch countdown;
 
 	//Constructor:
-	public M(int id,int duration) {
+	public M(int id,int duration, CountDownLatch countdown) {
 		super("M"+id);
 		this.id=id;
 		this.duration=duration;
+		this.countdown=countdown;
 	}
 
 	@Override
 	protected void initialize() {
-		//SyncInitialize.getInstance().addInit();
 		Diary diary= Diary.getInstance();
 		diary.increment();
 		subscribeBroadcast(TickBroadcast.class , br -> {
@@ -82,6 +84,8 @@ public class M extends Subscriber {
 				}
 			}
 		});
+		System.out.println("M "+id+" is UP");
+		countdown.countDown();
 	}
 
 }

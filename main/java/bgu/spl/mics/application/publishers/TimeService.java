@@ -32,13 +32,25 @@ public class TimeService extends Publisher {
 
 	@Override
 	protected void initialize() {
+		System.out.println("Time Service is UP");
 	}
 
 	@Override
 	public void run() {
+		initialize();
 		while (tick <= duration) {
-			System.out.println("Sender " + getName() + " publish a broadcast");
 			SimplePublisher simplePublisher = this.getSimplePublisher();
+			TickBroadcast tickBroadcast = new TickBroadcast(tick);
+			if (tick==duration){tickBroadcast.setTermminate(true);}
+			simplePublisher.sendBroadcast(tickBroadcast);
+			System.out.println(getName() + " publish a broadcast " + tick);
+			tick++;
+			try {
+				Thread.currentThread().sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			/*
 			TimerTask ticker = new TimerTask() {
 				public void run() {
 					TickBroadcast broadcast = new TickBroadcast(tick);
@@ -54,7 +66,8 @@ public class TimeService extends Publisher {
 				Thread.currentThread().sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}
+			}*/
 		}
+		System.out.println("Time Service terminate");
 	}
 }

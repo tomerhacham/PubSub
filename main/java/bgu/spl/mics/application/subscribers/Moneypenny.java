@@ -11,6 +11,7 @@ import bgu.spl.mics.application.passiveObjects.Squad;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Only this type of Subscriber can access the squad.
@@ -22,18 +23,19 @@ import java.util.List;
 public class Moneypenny extends Subscriber {
 	//Fields:
 	private Integer id;
-	int tickMP;
-	Squad squad = Squad.getInstance();
+	private int tickMP;
+	private CountDownLatch countdown;
+	private Squad squad = Squad.getInstance();
 
 	//Constructor:
-	public Moneypenny(int id) {
+	public Moneypenny(int id, CountDownLatch countdown) {
 		super("Moneypenny "+id);
 		this.id = id;
+		this.countdown=countdown;
 	}
 
 	@Override
 	protected void initialize() {
-		//SyncInitialize.getInstance().addInit();
 		subscribeBroadcast(TickBroadcast.class, br -> {
 			if (br.isTermminate()) {
 				terminate();
@@ -57,7 +59,8 @@ public class Moneypenny extends Subscriber {
 			squad.releaseAgents(Send_agents.GetSerialAgentsNumbers());
 			complete(Send_agents, squad.getAgentsNames(Send_agents.GetSerialAgentsNumbers()));
 		});
-
+		System.out.println("Moneypenny "+this.id+" is UP");
+		countdown.countDown();
 	}
 }
 
