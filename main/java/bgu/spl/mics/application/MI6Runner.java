@@ -4,7 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import bgu.spl.mics.application.passiveObjects.*;
@@ -22,8 +22,9 @@ import org.json.simple.parser.*;
  */
 public class MI6Runner {
     public static void main(String[] args) {
-        List<Thread> threads = new LinkedList<Thread>();
-
+        List<Runnable> runnables = new LinkedList<>();
+        List<Thread> threads = new LinkedList<>();
+        //region LoadJSON
         Object obj = null;
         try {
             obj = new JSONParser().parse(new FileReader(args[0]));
@@ -35,51 +36,58 @@ public class MI6Runner {
         JSONObject json = (JSONObject) obj;
         JSONArray inv = (JSONArray) json.get("inventory");
         String[] s = MI6Runner.ConvertJSONArrayToStringArray(inv);
+        //endregion
 
-        //Create Inventory
+        //region Create Inventory
         Inventory.getInstance().load(s);
+        //endregion
 
         JSONObject services = (JSONObject) json.get("services");
-        //Create TimeService
+        CountDownLatch countDown = new CountDownLatch(countNumberOfThreads(services)-1);
+
+        //region Create TimeService
         Long time = (Long) services.get("time");
         TimeService timeService = new TimeService(time.intValue());
         Thread time_service_thread = new Thread(timeService);
         time_service_thread.setName("Time Service");
-       // threads.add(time_service_thread);
+        //endregion
 
-        //Create M and Moneypenny
+        //region Create M and Moneypenny
         Long Moneypenny =(Long)services.get("Moneypenny");
         Long M = (Long)services.get("M");
         for(int i=0;i<Moneypenny;i++){
-            Moneypenny moneypenny= new Moneypenny(i+1);
+            Moneypenny moneypenny= new Moneypenny(i+1,countDown);
             Thread moneypenny_thread = new Thread(moneypenny);
             moneypenny_thread.setName("Moneypenny "+(i+1));
             threads.add(moneypenny_thread);
+            runnables.add(moneypenny);
         }
 
         for(int i=0;i<M;i++){
-            M m= new M(i+1,time.intValue());
+            M m= new M(i+1,time.intValue(),countDown);
             Thread m_thread = new Thread(m);
             m_thread.setName("M "+(i+1));
             threads.add(m_thread);
+            runnables.add(m);
         }
+        //endregion
 
-
-        //Create all intelligence sources
+        //region Create all intelligence sources
         JSONArray intelligence = (JSONArray) services.get("intelligence");
-        //List<Intelligence> IntelSources = new LinkedList<>();
         int index=1;
         for (Object _intelsource:intelligence ) {
             JSONObject intelsource = (JSONObject)_intelsource;
             JSONArray missions = (JSONArray) intelsource.get("missions");
-            Intelligence intelligence1 = new Intelligence(MI6Runner.createMissions(missions));
+            Intelligence intelligence1 = new Intelligence(MI6Runner.createMissions(missions),countDown);
             Thread intel_thread = new Thread(intelligence1);
             intel_thread.setName("intelligence "+index);
             threads.add(intel_thread);
+            runnables.add(intelligence1);
             index++;
         }
+        //endregion
 
-        //Create Squad
+        //region Create Squad
         Squad squad = Squad.getInstance();
         JSONArray sqd = (JSONArray)json.get("squad");
         Agent[] agents = new Agent[sqd.size()];
@@ -91,47 +99,47 @@ public class MI6Runner {
             i++;
         }
         squad.load(agents);
+        //endregion
 
-        //Initialize all threads
-        //SyncInitialize.getInstance().setnumberOfThreads(threads.size());
-
+        //region Initialize all threads
+/*        ExecutorService Executor =  Executors.newFixedThreadPool(runnables.size());
+        for (Runnable runnable:runnables) {
+            Executor.submit(runnable);
+            Executor.execute(runnable);
+        }
+        Executor.shutdown();
+        try {
+            countDown.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Executor.submit(timeService);
+        Executor.execute(time_service_thread);*/
         for (Thread thread:threads) {
             thread.start();
-            System.out.println(thread.getName());
+        }
+        try {
+            countDown.await();
+            System.out.println("-------------ALL PROCESS ARE UP--------------");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         time_service_thread.start();
-        System.out.println("Start Time Service");
+        //endregion
 
-        try {
-            Thread.currentThread().sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        try {
-            time_service_thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-/*        for (Thread thread: threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }*/
-
-        //Output to Json
+        //region Output to Json
         Inventory.getInstance().printToFile("inventory");
-        Diary.getInstance().printToFile("Diary");
+        //Diary.getInstance().printToFile("Diary");
+        //endregion
 
-/*        while(!SyncInitialize.getInstance().getNumberOfInitialize().equals(new AtomicInteger(threads.size()))){
-            try {
-                TimeUnit.MILLISECONDS.sleep(100);
-            } catch (InterruptedException e) {
-                //
-            }
-        }
-        time_service_thread.start();*/
+    }
+    private static int countNumberOfThreads(JSONObject services){
+        int M = ((Long)services.get("M")).intValue();
+        int Moneypenny = ((Long)services.get("Moneypenny")).intValue();
+        int intelligence = ((JSONArray)services.get("intelligence")).size();
+        int Q = 1;
+        System.out.println("All proccess: "+(M+Moneypenny+intelligence+Q));
+        return M+Moneypenny+intelligence+Q;
     }
 
     private static List<MissionInfo> createMissions(JSONArray info){
