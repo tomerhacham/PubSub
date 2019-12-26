@@ -1,4 +1,6 @@
 package bgu.spl.mics;
+import bgu.spl.mics.application.messages.*;
+
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -20,7 +22,13 @@ public class MessageBrokerImpl implements MessageBroker {
 
 
 	//Constructor:
-	private MessageBrokerImpl(){};
+	private MessageBrokerImpl(){
+		List<ConcurrentLinkedQueue> Pool = MessageBrokerImpl.makePools();
+		List<Message> Messages = MessageBrokerImpl.makeMessages();
+		for(int i=0;i<Pool.size();i++){
+			eventsPool.put(Messages.get(i).getClass(), Pool.get(i));
+		}
+	};
 
 	/**
 	 * Retrieves the single instance of this class.
@@ -34,11 +42,12 @@ public class MessageBrokerImpl implements MessageBroker {
 		if(eventsPool.get(type)!= null){
 			eventsPool.get(type).add(m);
 		}
-		else{
+		/*else{
 			ConcurrentLinkedQueue<Subscriber> subscriberspool = new ConcurrentLinkedQueue<>();
 			subscriberspool.add(m);
 			eventsPool.put(type,subscriberspool);
-		}
+		}*/
+		System.out.println(m.getName()+" subscribe to event: "+type.getSimpleName());
 
 	}
 
@@ -46,12 +55,17 @@ public class MessageBrokerImpl implements MessageBroker {
 	public void subscribeBroadcast(Class<? extends Broadcast> type, Subscriber m) {
 		if(eventsPool.get(type)!= null){
 			eventsPool.get(type).add(m);
+			System.out.println(m.getName()+"---Added to existing pool");
 		}
-		else{
+		/*else{
 			ConcurrentLinkedQueue<Subscriber> subscriberspool = new ConcurrentLinkedQueue<>();
 			subscriberspool.add(m);
 			eventsPool.put(type,subscriberspool);
-		}
+			System.out.println(m.getName()+ "--- make NEW pool for the broadcast");
+
+		}*/
+		System.out.println(m.getName()+" subscribe to broadcast: "+type.getSimpleName());
+
 	}
 
 	@Override
@@ -65,6 +79,8 @@ public class MessageBrokerImpl implements MessageBroker {
 	@Override
 	public void sendBroadcast(Broadcast b) {
 		ConcurrentLinkedQueue<Subscriber> subscriberQueue = eventsPool.get(b.getClass());
+		System.out.println("--for Broadcast:");
+		printQueue(subscriberQueue);
 		if(subscriberQueue!=null) {
 			for(int i=0; i< subscriberQueue.size(); i++){
 				Subscriber sub = subscriberQueue.poll();
@@ -83,6 +99,8 @@ public class MessageBrokerImpl implements MessageBroker {
 	public <T> Future<T> sendEvent(Event<T> e) {
 		Future<T> future = null;
 		ConcurrentLinkedQueue<Subscriber> pool =  eventsPool.get(e.getClass());
+		System.out.println("--for Event:");
+		printQueue(pool);
 		if (pool!=null){
 			if(!pool.isEmpty()) {
 				Subscriber sub = pool.poll();
@@ -105,13 +123,14 @@ public class MessageBrokerImpl implements MessageBroker {
 
 
 	@Override
-	public void register(Subscriber m) {
+	public synchronized void register(Subscriber m) {
 		LinkedBlockingQueue<Message> queue = new LinkedBlockingQueue<>();
 		queues.put(m,queue);
+		System.out.println(m.getName()+" register");
 	}
 
 	@Override
-	public void unregister(Subscriber m) {
+	public synchronized void unregister(Subscriber m) {
 		if(queues.keySet().contains(m)){
 			queues.remove(m,queues.get(m));
 			for (Class<? extends Message> type: eventsPool.keySet()){
@@ -119,6 +138,8 @@ public class MessageBrokerImpl implements MessageBroker {
 					while(pool.contains(m)){pool.remove(m);}
 				}
 			}
+		System.out.println(m.getName()+" unregister");
+
 
 	}
 
@@ -128,6 +149,50 @@ public class MessageBrokerImpl implements MessageBroker {
 		return queue.take();
 	}
 
-	
+	private void printQueue(ConcurrentLinkedQueue<Subscriber> queue){
+		for (Subscriber sub:queue) {
+			System.out.println(sub.getName());
+		}
+	}
+
+	private static List<ConcurrentLinkedQueue> makePools(){
+		List<ConcurrentLinkedQueue> pools = new LinkedList<>();
+
+		ConcurrentLinkedQueue<Subscriber> TickBroadcastPool = new ConcurrentLinkedQueue<>();
+		ConcurrentLinkedQueue<Subscriber> AgentAvailablePool = new ConcurrentLinkedQueue<>();
+		ConcurrentLinkedQueue<Subscriber> GadgetAvailablePool = new ConcurrentLinkedQueue<>();
+		ConcurrentLinkedQueue<Subscriber> MissionReceivedEventPool = new ConcurrentLinkedQueue<>();
+		ConcurrentLinkedQueue<Subscriber> RecallAgentsEventPool = new ConcurrentLinkedQueue<>();
+		ConcurrentLinkedQueue<Subscriber> SendAgentsEventPool = new ConcurrentLinkedQueue<>();
+
+		pools.add(TickBroadcastPool);
+		pools.add(AgentAvailablePool);
+		pools.add(GadgetAvailablePool);
+		pools.add(MissionReceivedEventPool);
+		pools.add(RecallAgentsEventPool);
+		pools.add(SendAgentsEventPool);
+
+		return pools;
+	}
+
+	private static List<Message> makeMessages(){
+		List<Message> messages = new LinkedList<>();
+
+		AgentsAvailableEvent agentsAvailableEvent = new AgentsAvailableEvent();
+		GadgetAvailableEvent gadgetAvailableEvent = new GadgetAvailableEvent();
+		MissionReceivedEvent missionReceivedEvent = new MissionReceivedEvent();
+		RecallAgentsEvent recallAgentsEvent = new RecallAgentsEvent();
+		SendAgentsEvent sendAgentsEvent = new SendAgentsEvent();
+		TickBroadcast tickBroadcast = new TickBroadcast();
+
+		messages.add(agentsAvailableEvent);
+		messages.add(gadgetAvailableEvent);
+		messages.add(missionReceivedEvent);
+		messages.add(recallAgentsEvent);
+		messages.add(sendAgentsEvent);
+		messages.add(tickBroadcast);
+
+		return messages;
+	}
 
 }
