@@ -42,7 +42,7 @@ public class Q extends Subscriber {
 			System.out.println(Thread.currentThread().getName()+ " recieved gadget aviable: " + event.hashCode());
 			String requested_gadget=event.getRequested_gadget();
 			if(inventory.getItem(requested_gadget)){
-				complete(event,tick );
+				complete(event,tick);
 				}
 			else{complete(event,-1);}
 		});

@@ -51,37 +51,39 @@ public class M extends Subscriber {
 			GadgetAvailableEvent getGadet = new GadgetAvailableEvent(income_mission.getMissionInfo().getGadget());
 			Future<Integer> FutureQ = getSimplePublisher().sendEvent(getGadet);
 			System.out.println(Thread.currentThread().getName() + " sent gadget aviable: " + getGadet.hashCode());
-			if(FutureQ.get()!=-1) {
+			Integer Q= FutureQ.get();
+			if(Q!=-1) {
 				System.out.println(Thread.currentThread().getName()+ " recieve gadget from q: " + FutureQ.hashCode());
 				AgentsAvailableEvent getAgents = new AgentsAvailableEvent(income_mission.getMissionInfo().getSerialAgentsNumbers());
 				Future<Integer> FutureMP = getSimplePublisher().sendEvent(getAgents);
 				System.out.println(Thread.currentThread().getName()+ " sent agent aviable: "+ getAgents.hashCode());
 				MissionInfo missionInfo = income_mission.getMissionInfo();
+				Integer MP= FutureMP.get();
 
-
-				if (FutureMP != null) {
-					System.out.println(Thread.currentThread().getName()+ "recieved agents from mp: " +FutureMP.hashCode() +":" +FutureMP.get());
-
+				if (MP != null) {
+					System.out.println(Thread.currentThread().getName()+ "recieved agents from mp: " +MP.hashCode() +":" +MP);
 					boolean missioncomplete = false;
 
 					if (tickM < missionInfo.getTimeExpired()) {
 
 						missioncomplete = true;
 						SendAgentsEvent sendAgents = new SendAgentsEvent(income_mission.getMissionInfo().getSerialAgentsNumbers(), missionInfo.getDuration());
-						Future<List<String>> agentsName = getSimplePublisher().sendEvent(sendAgents);
-						if (agentsName.get() != null) {
+						Future<List<String>> FutureSendAgents  = getSimplePublisher().sendEvent(sendAgents);
+						List<String> agentsName= FutureSendAgents.get();
+						if (agentsName != null) {
 
 							Report report = new Report();
 
 							report.setMissionName(missionInfo.getMissionName());
 							report.setM(this.id);
-							report.setMoneypenny(FutureMP.get());
+							report.setMoneypenny(MP);
 							report.setAgentsSerialNumbersNumber(missionInfo.getSerialAgentsNumbers());
-							report.setAgentsNames(agentsName.get());
+							report.setAgentsNames(agentsName);
 							report.setTimeIssued(missionInfo.getTimeIssued());
-							report.setQTime(FutureQ.get());
+							report.setQTime(Q);
 							report.setTimeCreated(tickM);
 							diary.addReport(report);
+							System.out.println("REPORT CREATE");
 						}
 
 					}

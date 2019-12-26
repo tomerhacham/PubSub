@@ -38,6 +38,8 @@ public class Moneypenny extends Subscriber {
 	protected void initialize() {
 		subscribeBroadcast(TickBroadcast.class, br -> {
 			if (br.isTermminate()) {
+
+				squad.releaseAgents(new LinkedList<String>());
 				terminate();
 			}
 			if (br.getTickNum() >= 0) {
@@ -49,6 +51,7 @@ public class Moneypenny extends Subscriber {
 			System.out.println(Thread.currentThread().getName()+ " recieved agents aviable: "+ Get_Agents.hashCode());
 			List<String> serials= Get_Agents.getSerialAgentsNumbers();
 			if (squad.getAgents(serials)) {
+				System.out.println("agents go to mission");
 				complete(Get_Agents, id);
 			}
 		});
@@ -58,7 +61,7 @@ public class Moneypenny extends Subscriber {
 		});
 
 		subscribeEvent(SendAgentsEvent.class, Send_agents-> {
-			squad.releaseAgents(Send_agents.GetSerialAgentsNumbers());
+			squad.sendAgents(Send_agents.GetSerialAgentsNumbers(), Send_agents.getTimeToSleep());
 			complete(Send_agents, squad.getAgentsNames(Send_agents.GetSerialAgentsNumbers()));
 		});
 		System.out.println("Moneypenny "+this.id+" is UP");

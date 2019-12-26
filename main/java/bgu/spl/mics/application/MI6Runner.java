@@ -135,6 +135,7 @@ public class MI6Runner {
         time_service_thread.start();
         //endregion
 
+        System.out.println("join to all");
         for (Thread thread:threads) {
             try {
                 thread.join();

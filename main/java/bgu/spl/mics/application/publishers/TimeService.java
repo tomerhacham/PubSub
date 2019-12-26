@@ -46,7 +46,7 @@ public class TimeService extends Publisher {
 			System.out.println("------------------"+getName() + " publish a broadcast " + tick);
 			tick++;
 			try {
-				Thread.currentThread().sleep(500);
+				Thread.currentThread().sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

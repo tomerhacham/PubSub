@@ -66,11 +66,10 @@ public class Squad {
 	 */
 	public void sendAgents(List<String> serials, int time){
 		try {
+			System.out.println("Execute Mission");
 			sleep(time);
-			for (String serial: serials){
-				Agent agent= agents.get(serial);
-				agent.release();
-			}
+			releaseAgents(serials);
+			System.out.println("Agents came back");
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -81,7 +80,7 @@ public class Squad {
 	 * @param serials   the serial numbers of the agents
 	 * @return ‘false’ if an agent of serialNumber ‘serial’ is missing, and ‘true’ otherwise
 	 */
-	public boolean getAgents(List<String> serials){
+	public synchronized boolean getAgents(List<String> serials){
 		for (String serial: serials){
 			if(!agents.containsKey(serial)){
 				return false;
@@ -93,7 +92,7 @@ public class Squad {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						//e.printStackTrace();
+						  e.printStackTrace();
 					}
 				}
 				agent.acquire();
