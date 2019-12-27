@@ -46,8 +46,10 @@ public class Intelligence extends Subscriber {
 
 				}
 				if(eventToSend!=null){
+					eventToSend.setSender(Thread.currentThread().getName());
 					super.getSimplePublisher().sendEvent(eventToSend);
-					System.out.println(Thread.currentThread().getName()+" sent a mission: "+ eventToSend.hashCode());
+					System.out.println(eventToSend);
+					//System.out.println(Thread.currentThread().getName()+" sent a mission: "+ eventToSend.getMissionInfo().getMissionName());
 				}
 			}
 		});

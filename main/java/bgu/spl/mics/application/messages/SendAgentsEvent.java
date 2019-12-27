@@ -8,6 +8,8 @@ import java.util.List;
         //fields:
         private List<String> serialAgentsNumbers;
         private  int timeToSleep;
+        private String sender;
+        private String receiver;
         //constructors:
         public SendAgentsEvent(List<String> serialAgentsNumbers, int timeToSleep){
             this.serialAgentsNumbers=serialAgentsNumbers;
@@ -21,4 +23,28 @@ import java.util.List;
         public int getTimeToSleep(){
             return this.timeToSleep;
         }
-}
+        public String getSender() {
+            return sender;
+        }
+
+        public void setSender(String sender) {
+            this.sender = sender;
+        }
+
+        public String getReceiver() {
+            return receiver;
+        }
+
+        public void setReceiver(String receiver) {
+            this.receiver = receiver;
+        }
+
+        @Override
+        public String toString() {
+            return "SendAgentsEvent{" +
+                    "sender='" + sender + '\'' +
+                    ", receiver='" + receiver + '\'' +
+                    ", SendAgents='" + serialAgentsNumbers.toString() + '\'' +
+                    '}';
+        }
+    }

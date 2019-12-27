@@ -39,12 +39,19 @@ public class Q extends Subscriber {
 			}
 		});
 		subscribeEvent(GadgetAvailableEvent.class, event ->{
-			System.out.println(Thread.currentThread().getName()+ " recieved gadget aviable: " + event.hashCode());
+			event.setReceiver(Thread.currentThread().getName());
+			System.out.println(event);
+			//System.out.println("***callback:"+Thread.currentThread().getName()+ " GadgetAvailableEvent: " + event.hashCode());
 			String requested_gadget=event.getRequested_gadget();
 			if(inventory.getItem(requested_gadget)){
 				complete(event,tick);
+				System.out.println("Q supplied "+requested_gadget);
 				}
-			else{complete(event,-1);}
+			else{
+				complete(event,-1);
+				System.out.println("Q did not supplied "+requested_gadget);
+				}
+			System.out.println("GadgetAvailableEvent COMPLETE");
 		});
 		System.out.println("Q is UP");
 		countdown.countDown();

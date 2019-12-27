@@ -1,5 +1,7 @@
 package bgu.spl.mics.application.subscribers;
 
+import bgu.spl.mics.Event;
+import bgu.spl.mics.Future;
 import bgu.spl.mics.Subscriber;
 import bgu.spl.mics.application.SyncInitialize;
 import bgu.spl.mics.application.messages.AgentsAvailableEvent;
@@ -9,8 +11,10 @@ import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.passiveObjects.Agent;
 import bgu.spl.mics.application.passiveObjects.Squad;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -26,12 +30,15 @@ public class Moneypenny extends Subscriber {
 	private int tickMP;
 	private CountDownLatch countdown;
 	private Squad squad = Squad.getInstance();
+	private LinkedList<Event> events;
 
 	//Constructor:
 	public Moneypenny(int id, CountDownLatch countdown) {
 		super("Moneypenny "+id);
 		this.id = id;
 		this.countdown=countdown;
+		events = new LinkedList<Event>();
+
 	}
 
 	@Override
@@ -48,24 +55,45 @@ public class Moneypenny extends Subscriber {
 			}
 		});
 		subscribeEvent(AgentsAvailableEvent.class, Get_Agents -> {
-			System.out.println(Thread.currentThread().getName()+ " recieved agents aviable: "+ Get_Agents.hashCode());
+			Get_Agents.setReceiver(Thread.currentThread().getName());
+			System.out.println(Get_Agents);
+			events.add(Get_Agents);
+			//System.out.println("***callback:"+Thread.currentThread().getName()+ " received AgentsAvailableEvent: "+ Get_Agents.hashCode());
 			List<String> serials= Get_Agents.getSerialAgentsNumbers();
-			if (squad.getAgents(serials)) {
-				System.out.println("agents go to mission");
+			if (squad.getAgents(Get_Agents.getSerialAgentsNumbers())) {
 				complete(Get_Agents, id);
+				System.out.println(Thread.currentThread().getName()+" answered that the"+serials.toString()+" are COMPLETE");
+			}
+			else {
+				System.out.println(Thread.currentThread().getName()+" answered that the"+serials.toString()+" are NOT COMPLETE");
+				complete(Get_Agents, null);
 			}
 		});
 		subscribeEvent(RecallAgentsEvent.class, Release_agents -> {
+			Release_agents.setReceiver(Thread.currentThread().getName());
+			System.out.println(Release_agents);
+			events.add(Release_agents);
 			squad.releaseAgents(Release_agents.GetSerialAgentsNumbers());
 			complete(Release_agents, true);
+			System.out.println("***callback:"+Thread.currentThread().getName()+" RecallAgentsEvent COMPLETE");
 		});
 
 		subscribeEvent(SendAgentsEvent.class, Send_agents-> {
-			squad.sendAgents(Send_agents.GetSerialAgentsNumbers(), Send_agents.getTimeToSleep());
+			Send_agents.setReceiver(Thread.currentThread().getName());
+			System.out.println(Send_agents);
+			//System.out.println(Thread.currentThread().getName()+"received SendAgentsEvent");
+			events.add(Send_agents);
 			complete(Send_agents, squad.getAgentsNames(Send_agents.GetSerialAgentsNumbers()));
+			squad.sendAgents(Send_agents.GetSerialAgentsNumbers(), Send_agents.getTimeToSleep());
+				System.out.println("***callback:" + Thread.currentThread().getName() + " SendAgentsEvent " + Send_agents.GetSerialAgentsNumbers().toString() + " COMPLETE");
+
 		});
 		System.out.println("Moneypenny "+this.id+" is UP");
 		countdown.countDown();
+	}
+
+	public List<Event> getEvent(){
+		return this.events;
 	}
 }
 

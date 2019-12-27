@@ -1,5 +1,6 @@
 package bgu.spl.mics;
 import bgu.spl.mics.application.messages.*;
+import bgu.spl.mics.application.subscribers.Moneypenny;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -79,7 +80,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	@Override
 	public void sendBroadcast(Broadcast b) {
 		ConcurrentLinkedQueue<Subscriber> subscriberQueue = eventsPool.get(b.getClass());
-		System.out.println("--for Broadcast:");
+		//System.out.println("--for Broadcast:");
 		//printQueue(subscriberQueue);
 		if(subscriberQueue!=null) {
 			for(int i=0; i< subscriberQueue.size(); i++){
@@ -101,7 +102,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	public <T> Future<T> sendEvent(Event<T> e) {
 		Future<T> future = null;
 		ConcurrentLinkedQueue<Subscriber> pool =  eventsPool.get(e.getClass());
-		System.out.println("--Pool for Event:");
+		//System.out.println("--Pool for Event:");
 		//printQueue(pool);
 		if (pool!=null){
 			if(!pool.isEmpty()) {
@@ -141,6 +142,18 @@ public class MessageBrokerImpl implements MessageBroker {
 					ConcurrentLinkedQueue  pool = eventsPool.get(type);
 					while(pool.contains(m)){pool.remove(m);}
 				}
+			if(m.getName().contains("moneypenny")){
+				List<Event> events= ((Moneypenny)m).getEvent();
+				for(Event event:events){
+					futures.get(event).resolve(-1);
+				}
+			}
+			/*BlockingQueue<Message> subscriberQueue = queues.get(m);
+			for(Message message: subscriberQueue){
+				if(futures.get(message)!=null){
+					futures.get(message).resolve(-1);
+					}
+				}*/
 			}
 		System.out.println(m.getName()+" unregister");
 

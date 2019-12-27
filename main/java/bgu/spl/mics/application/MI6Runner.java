@@ -135,7 +135,8 @@ public class MI6Runner {
         time_service_thread.start();
         //endregion
 
-        System.out.println("join to all");
+       System.out.println("join to all");
+        threads.add(time_service_thread);
         for (Thread thread:threads) {
             try {
                 thread.join();
@@ -143,12 +144,17 @@ public class MI6Runner {
                 e.printStackTrace();
             }
         }
-
         //region Output to Json
         Inventory.getInstance().printToFile("inventory");
         Diary.getInstance().printToFile("Diary");
         //endregion
-        System.exit(0);
+
+        System.out.println("-------------END STATUS---------------");
+        for (Thread thread:threads) {
+            System.out.println("Alive status of "+thread.getName()+": "+thread.isAlive());
+        }
+        System.out.println("----------------------THE END--------------------------");;
+
 
     }
     private static int countNumberOfThreads(JSONObject services){

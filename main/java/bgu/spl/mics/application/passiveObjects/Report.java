@@ -13,6 +13,21 @@ import java.util.List;
  */
 public class Report {
 
+	@Override
+	public String toString() {
+		return "Report{" +
+				"MissionName='" + MissionName + '\'' +
+				", M=" + M +
+				", Moneypenny=" + Moneypenny +
+				", AgentsSerialNumbers=" + AgentsSerialNumbers +
+				", AgentsNames=" + AgentsNames +
+				", GadgetName='" + GadgetName + '\'' +
+				", TimeIssued=" + TimeIssued +
+				", QTime=" + QTime +
+				", TimeCreated=" + TimeCreated +
+				'}';
+	}
+
 	private String MissionName;
 	private int M;
 	private int Moneypenny;

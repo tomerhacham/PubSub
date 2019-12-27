@@ -3,6 +3,8 @@ package bgu.spl.mics.application.publishers;
 import bgu.spl.mics.Publisher;
 import bgu.spl.mics.SimplePublisher;
 import bgu.spl.mics.application.messages.TickBroadcast;
+import bgu.spl.mics.application.passiveObjects.Diary;
+import bgu.spl.mics.application.passiveObjects.Inventory;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -50,24 +52,9 @@ public class TimeService extends Publisher {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			/*
-			TimerTask ticker = new TimerTask() {
-				public void run() {
-					TickBroadcast broadcast = new TickBroadcast(tick);
-					if (tick == duration) {
-						broadcast.setTermminate(true);
-					}
-
-					simplePublisher.sendBroadcast(broadcast);
-				}
-			};
-			timer.scheduleAtFixedRate(ticker, 0, 1000);
-			try {
-				Thread.currentThread().sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}*/
 		}
+		this.timer.cancel();
+		this.timer.purge();
 		System.out.println("Time Service terminate");
 	}
 }

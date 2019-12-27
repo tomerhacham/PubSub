@@ -85,6 +85,7 @@ public class Inventory {
 
 			file.write(array.toJSONString());
 			file.flush();
+			file.close();
 
 		} catch (IOException e) {
 			e.printStackTrace();

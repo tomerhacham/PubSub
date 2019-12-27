@@ -103,6 +103,8 @@ public class Diary {
 
 		try (FileWriter file = new FileWriter(filename + ".json")) {
 			file.write(finalDiary.toJSONString());
+			file.flush();
+			file.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
