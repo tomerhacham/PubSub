@@ -30,6 +30,7 @@ public class Intelligence extends Subscriber {
 
 	@Override
 	protected void initialize() {
+		//region Broadcast handle
 		subscribeBroadcast(TickBroadcast.class , br -> {
 			if (br.isTermminate())
 			{ terminate(); }
@@ -37,11 +38,12 @@ public class Intelligence extends Subscriber {
 				tick=br.getTickNum();
 				System.out.println(Thread.currentThread().getName()+" received broadcast at time "+tick);
 				MissionReceivedEvent eventToSend=null;
-				for (MissionInfo missioninfo:missions) {
+				for (int i=0 ; i<missions.size();i++) {
+					MissionInfo missioninfo = missions.get(i);
 					if (missioninfo.getTimeIssued()==tick){
 						eventToSend = new MissionReceivedEvent(missioninfo);
 						missions.remove(missioninfo);
-						break;
+
 					}
 
 				}
@@ -49,28 +51,11 @@ public class Intelligence extends Subscriber {
 					eventToSend.setSender(Thread.currentThread().getName());
 					super.getSimplePublisher().sendEvent(eventToSend);
 					System.out.println(eventToSend);
-					//System.out.println(Thread.currentThread().getName()+" sent a mission: "+ eventToSend.getMissionInfo().getMissionName());
 				}
 			}
 		});
+		//endregion
 		System.out.println("Intelligence is UP");
 		countdown.countDown();
 	}
-
-	/**
-	 * method will check is there is any mission available for the specific tick and if so will create an MissionReceivedEvent
-	 * @param tick
-	 * @return
-	 */
-	private MissionReceivedEvent checkForMissionAtTick(int tick){
-		MissionReceivedEvent missionReceivedEvent=null;
-		for (MissionInfo missioninfo:missions)
-		{
-			if(missioninfo.getTimeIssued()==tick){
-				missionReceivedEvent = new MissionReceivedEvent(missioninfo);
-			}
-		}
-		return missionReceivedEvent;
-	}
-
 }

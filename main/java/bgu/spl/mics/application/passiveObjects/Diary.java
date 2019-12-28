@@ -1,5 +1,9 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -83,7 +87,7 @@ public class Diary {
 			JSONArray agentsNames = new JSONArray();
 			agentIndex = 0;
 			for(String agentName : OurReport.getAgentsNames()){
-				agentsSerialNumber.add(agentIndex,agentName);
+				agentsNames.add(agentIndex,agentName);
 				agentIndex++;
 			}
 			report.put("agentsName",agentsNames);
@@ -97,12 +101,27 @@ public class Diary {
 			missionIndex++;
 		}
 
+		JSONObject totalobject = new JSONObject();
+		totalobject.put("total",total);
 
-		finalDiary.put("reports",reports);
-		finalDiary.put("total",total);
+		JSONObject allreports = new JSONObject();
+		allreports.put("reports",reports);
+
+		JSONArray FINAL = new JSONArray();
+		FINAL.add(allreports);
+		FINAL.add(totalobject);
+
+
+		//finalDiary.put("reports",reports);
+		//finalDiary.put("total",total);
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		JsonParser jp = new JsonParser();
+		JsonElement je = jp.parse(FINAL.toJSONString());
+		String prettyJsonString = gson.toJson(je);
+
 
 		try (FileWriter file = new FileWriter(filename + ".json")) {
-			file.write(finalDiary.toJSONString());
+			file.write(prettyJsonString);
 			file.flush();
 			file.close();
 		} catch (IOException e) {

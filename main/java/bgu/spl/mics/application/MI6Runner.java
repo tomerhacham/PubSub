@@ -23,6 +23,7 @@ import org.json.simple.parser.*;
  */
 public class MI6Runner {
     public static void main(String[] args) {
+
         List<Runnable> runnables = new LinkedList<>();
         List<Thread> threads = new LinkedList<>();
         //region LoadJSON
@@ -57,12 +58,14 @@ public class MI6Runner {
         Long Moneypenny =(Long)services.get("Moneypenny");
         Long M = (Long)services.get("M");
         for(int i=0;i<Moneypenny;i++){
-            Moneypenny moneypenny= new Moneypenny(i+1,countDown);
-            Thread moneypenny_thread = new Thread(moneypenny);
-            moneypenny_thread.setName("Moneypenny "+(i+1));
-            threads.add(moneypenny_thread);
-            runnables.add(moneypenny);
-        }
+            Moneypenny moneypenny;
+            if(i==0){moneypenny= new Moneypenny(i+1,countDown,true);}
+            else{moneypenny= new Moneypenny(i+1,countDown,false);}
+                Thread moneypenny_thread = new Thread(moneypenny);
+                moneypenny_thread.setName("Moneypenny "+(i+1));
+                threads.add(moneypenny_thread);
+                runnables.add(moneypenny);
+            }
 
         for(int i=0;i<M;i++){
             M m= new M(i+1,time.intValue(),countDown);
@@ -110,19 +113,6 @@ public class MI6Runner {
         //endregion
 
         //region Initialize all threads
-/*        ExecutorService Executor =  Executors.newFixedThreadPool(runnables.size());
-        for (Runnable runnable:runnables) {
-            Executor.submit(runnable);
-            Executor.execute(runnable);
-        }
-        Executor.shutdown();
-        try {
-            countDown.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Executor.submit(timeService);
-        Executor.execute(time_service_thread);*/
         for (Thread thread:threads) {
             thread.start();
         }
@@ -149,7 +139,7 @@ public class MI6Runner {
         Diary.getInstance().printToFile("Diary");
         //endregion
 
-        System.out.println("-------------END STATUS---------------");
+        System.out.println("----------------------END STATUS-----------------------");
         for (Thread thread:threads) {
             System.out.println("Alive status of "+thread.getName()+": "+thread.isAlive());
         }

@@ -23,13 +23,11 @@ public class TimeService extends Publisher {
 	//Fields:
 	private int duration;
 	private int tick;
-	private Timer timer;
 
 	public TimeService(int duration) {
 		super("TimeService");
 		this.duration = duration;
 		this.tick = 1;
-		timer = new Timer();
 	}
 
 	@Override
@@ -53,8 +51,6 @@ public class TimeService extends Publisher {
 				e.printStackTrace();
 			}
 		}
-		this.timer.cancel();
-		this.timer.purge();
 		System.out.println("Time Service terminate");
 	}
 }
