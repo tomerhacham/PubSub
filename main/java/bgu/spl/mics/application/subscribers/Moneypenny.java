@@ -51,13 +51,13 @@ public class Moneypenny extends Subscriber {
 			//region Broadcast handle
 			subscribeBroadcast(TickBroadcast.class, br -> {
 				if (br.isTermminate()) {
-
-					squad.releaseAgents(new LinkedList<String>());
+					//squad.releaseAgents(squad.getAgentsSerials());
+					squad.releaseAgents(new LinkedList<>());
 					terminate();
 				}
 				if (br.getTickNum() >= 0) {
 					tickMP = br.getTickNum();
-					//System.out.println(Thread.currentThread().getName() + " received broadcast at time " + tickMP);
+					System.out.println(Thread.currentThread().getName() + " received broadcast at time " + tickMP);
 				}
 			});
 			//endregion
@@ -65,15 +65,15 @@ public class Moneypenny extends Subscriber {
 			//region AgentAvailable handle
 			subscribeEvent(AgentsAvailableEvent.class, Get_Agents -> {
 				Get_Agents.setReceiver(Thread.currentThread().getName());
-		//		System.out.println(Get_Agents);
+				System.out.println(Get_Agents);
 				events.add(Get_Agents);
-				//System.out.println("***callback:"+Thread.currentThread().getName()+ " received AgentsAvailableEvent: "+ Get_Agents.hashCode());
+				System.out.println("***callback:"+Thread.currentThread().getName()+ " received AgentsAvailableEvent: "+ Get_Agents.hashCode());
 				List<String> serials = Get_Agents.getSerialAgentsNumbers();
 				if (squad.getAgents(Get_Agents.getSerialAgentsNumbers())) {
 					complete(Get_Agents, id);
-		//			System.out.println(Thread.currentThread().getName() + " answered that the" + serials.toString() + " are Available");
+					System.out.println(Thread.currentThread().getName() + " answered that the" + serials.toString() + " are Available");
 				} else {
-		//			System.out.println(Thread.currentThread().getName() + " answered that the" + serials.toString() + " are NOT Available");
+					System.out.println(Thread.currentThread().getName() + " answered that the" + serials.toString() + " are NOT Available");
 					complete(Get_Agents, null);
 				}
 			});
@@ -86,13 +86,13 @@ public class Moneypenny extends Subscriber {
 			//region Broadcast handle
 			subscribeBroadcast(TickBroadcast.class, br -> {
 				if (br.isTermminate()) {
-
-					squad.releaseAgents(new LinkedList<String>());
+			//		squad.releaseAgents(squad.getAgentsSerials());
+					squad.releaseAgents(new LinkedList<>());
 					terminate();
 				}
 				if (br.getTickNum() >= 0) {
 					tickMP = br.getTickNum();
-				//	System.out.println(Thread.currentThread().getName() + " received broadcast at time " + tickMP);
+					System.out.println(Thread.currentThread().getName() + " received broadcast at time " + tickMP);
 				}
 			});
 			//endregion
@@ -100,12 +100,12 @@ public class Moneypenny extends Subscriber {
 			//region SendAgents handle
 			subscribeEvent(SendAgentsEvent.class, Send_agents -> {
 				Send_agents.setReceiver(Thread.currentThread().getName());
-		//		System.out.println(Send_agents);
-				//System.out.println(Thread.currentThread().getName()+"received SendAgentsEvent");
+				System.out.println(Send_agents);
+				System.out.println(Thread.currentThread().getName()+"received SendAgentsEvent");
 				events.add(Send_agents);
 				complete(Send_agents, squad.getAgentsNames(Send_agents.GetSerialAgentsNumbers()));
 				squad.sendAgents(Send_agents.GetSerialAgentsNumbers(), Send_agents.getTimeToSleep());
-		//		System.out.println("***callback:" + Thread.currentThread().getName() + " SendAgentsEvent " + Send_agents.GetSerialAgentsNumbers().toString() + " COMPLETE");
+				System.out.println("***callback:" + Thread.currentThread().getName() + " SendAgentsEvent " + Send_agents.GetSerialAgentsNumbers().toString() + " COMPLETE");
 
 			});
 			//endregion
@@ -113,17 +113,17 @@ public class Moneypenny extends Subscriber {
 			//region RecallAgent handle
 			subscribeEvent(RecallAgentsEvent.class, Release_agents -> {
 				Release_agents.setReceiver(Thread.currentThread().getName());
-		//		System.out.println(Release_agents);
+				System.out.println(Release_agents);
 				events.add(Release_agents);
 				squad.releaseAgents(Release_agents.GetSerialAgentsNumbers());
 				complete(Release_agents, true);
-		//		System.out.println("***callback:" + Thread.currentThread().getName() + " RecallAgentsEvent COMPLETE");
+				System.out.println("***callback:" + Thread.currentThread().getName() + " RecallAgentsEvent COMPLETE");
 			});
 			//endregion
 		}
 		//endregion
 
-	//	System.out.println("Moneypenny "+this.id+" is UP");
+		System.out.println("Moneypenny "+this.id+" is UP");
 		countdown.countDown();
 	}
 

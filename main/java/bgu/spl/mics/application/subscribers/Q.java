@@ -36,8 +36,8 @@ public class Q extends Subscriber {
 			}
 			if (br.getTickNum() >= 0) {
 				tick = br.getTickNum();
-		//		System.out.println("Qtick = "+tick);
-		//		System.out.println(Thread.currentThread().getName()+" received broadcast at time "+tick);
+				System.out.println("Qtick = "+tick);
+				System.out.println(Thread.currentThread().getName()+" received broadcast at time "+tick);
 			}
 		});
 		//endregion
@@ -50,24 +50,24 @@ public class Q extends Subscriber {
 				e.printStackTrace();
 			}*/
 			event.setReceiver(Thread.currentThread().getName());
-					//	System.out.println(event);
-			//System.out.println("***callback:"+Thread.currentThread().getName()+ " GadgetAvailableEvent: " + event.hashCode());
+						System.out.println(event);
+			System.out.println("***callback:"+Thread.currentThread().getName()+ " GadgetAvailableEvent: " + event.hashCode());
 			String requested_gadget=event.getRequested_gadget();
 			if(inventory.getItem(requested_gadget)){
 				complete(event,tick);
-		//		System.out.println("----------------Q tick at complete "+ tick);
-		//		System.out.println("Q supplied "+requested_gadget);
+				System.out.println("----------------Q tick at complete "+ tick);
+				System.out.println("Q supplied "+requested_gadget);
 				}
 			else{
 				complete(event,null);
-		//		System.out.println("----------------Q tick at complete "+ tick);
-				//		System.out.println("Q did not supplied "+requested_gadget);
+				System.out.println("----------------Q tick at complete "+ tick);
+						System.out.println("Q did not supplied "+requested_gadget);
 				}
-		//	System.out.println("GadgetAvailableEvent COMPLETE");
+			System.out.println("GadgetAvailableEvent COMPLETE");
 		});
 		//endregion
 
-	//	System.out.println("Q is UP");
+		System.out.println("Q is UP");
 		countdown.countDown();
 	}
 }

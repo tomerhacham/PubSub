@@ -32,7 +32,7 @@ public class TimeService extends Publisher {
 
 	@Override
 	protected void initialize() {
-		//System.out.println("Time Service is UP");
+		System.out.println("Time Service is UP");
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class TimeService extends Publisher {
 			TickBroadcast tickBroadcast = new TickBroadcast(tick);
 			if (tick==duration){tickBroadcast.setTermminate(true);}
 			simplePublisher.sendBroadcast(tickBroadcast);
-		//	System.out.println("------------------"+getName() + " publish a broadcast " + tick);
+			System.out.println("------------------"+getName() + " publish a broadcast " + tick);
 			tick++;
 			try {
 				Thread.currentThread().sleep(100);
@@ -51,7 +51,7 @@ public class TimeService extends Publisher {
 				e.printStackTrace();
 			}
 		}
-		//System.out.println("Time Service terminate");
+		System.out.println("Time Service terminate");
 		TickBroadcast tickBroadcast = new TickBroadcast(tick);
 		tickBroadcast.setTermminate(true);
 		getSimplePublisher().sendBroadcast(tickBroadcast);

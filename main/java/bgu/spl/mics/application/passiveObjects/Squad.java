@@ -17,6 +17,9 @@ public class Squad {
 	//Fields:
 	private Map<String, Agent> agents;
 	private static Squad squad = null;
+	private static class SingeltonHolder{
+		private static Squad instance = new Squad();
+	}
 
 	//Constructor:
 	/**
@@ -31,11 +34,7 @@ public class Squad {
 	 * Retrieves the single instance of this class.
 	 */
 	public static Squad getInstance() {
-		if(squad==null)
-		{
-			squad=new Squad();
-		}
-		return squad;
+		return SingeltonHolder.instance;
 	}
 
 	/**
@@ -117,5 +116,13 @@ public class Squad {
 
 	    return group;
     }
+
+    public List<String> getAgentsSerials(){
+		LinkedList<String> serials= new LinkedList<>() ;
+		for (String serial: agents.keySet()){
+			serials.add(serial);
+		}
+		return serials;
+	}
 
 }

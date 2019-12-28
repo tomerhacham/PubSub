@@ -23,6 +23,9 @@ public class Inventory {
 	//Fields:
 	private List<String> gadgets = new LinkedList<String>();
 	private static Inventory inventory=null;
+	private static class SingeltonHolder{
+		private static Inventory instance = new Inventory();
+	}
 
 	//Constructor:
 	/**
@@ -38,11 +41,7 @@ public class Inventory {
      * Retrieves the single instance of this class.
      */
 	public static Inventory getInstance() {
-		if(inventory==null)
-		{
-			inventory=new Inventory();
-		}
-		return inventory;
+		return SingeltonHolder.instance;
 	}
 
 	/**

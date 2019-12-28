@@ -42,7 +42,7 @@ public class M extends Subscriber {
 			{ terminate(); }
 			if(br.getTickNum()>=0){
 				tickM=br.getTickNum();
-			//	System.out.println(Thread.currentThread().getName()+" received broadcast at time "+tickM);
+				System.out.println(Thread.currentThread().getName()+" received broadcast at time "+tickM);
 			}
 		});
 		//endregion
@@ -80,30 +80,30 @@ public class M extends Subscriber {
 					getSimplePublisher().sendEvent(recallAgentsEvent);
 				}
 			}*/
-	//		System.out.println("tickM = "+tickM);
+			System.out.println("tickM = "+tickM);
 			diary.increment();
 			income_mission.setReceiver(Thread.currentThread().getName());
-	//		System.out.println(income_mission);
+			System.out.println(income_mission);
 			AgentsAvailableEvent getAgents = new AgentsAvailableEvent(income_mission.getMissionInfo().getSerialAgentsNumbers());
 			getAgents.setSender(Thread.currentThread().getName());
 			Future<Integer> FutureMP = getSimplePublisher().sendEvent(getAgents);
-	//		System.out.println(getAgents);
+			System.out.println(getAgents);
 			MissionInfo missionInfo = income_mission.getMissionInfo();
 			Integer MP= FutureMP.get();
 
 			//region Agents are available scenario
 			if(MP!= null) {
-	//			System.out.println("tick: "+tickM+" "+Thread.currentThread().getName() + " received AgentAvailableEvent: " + income_mission.getMissionInfo().getSerialAgentsNumbers().toString());
+				System.out.println("tick: "+tickM+" "+Thread.currentThread().getName() + " received AgentAvailableEvent: " + income_mission.getMissionInfo().getSerialAgentsNumbers().toString());
 				GadgetAvailableEvent getGadet = new GadgetAvailableEvent(income_mission.getMissionInfo().getGadget());
 				getGadet.setSender(Thread.currentThread().getName());
-	//			System.out.println(getGadet);
+				System.out.println(getGadet);
 				Future<Integer> FutureQ = getSimplePublisher().sendEvent(getGadet);
-	//			System.out.println(Thread.currentThread().getName() + " sent GadgetAvailableEvent: " + getGadet.getRequested_gadget());
+				System.out.println(Thread.currentThread().getName() + " sent GadgetAvailableEvent: " + getGadet.getRequested_gadget());
 				Integer Q= FutureQ.get();
 
 				//region Gadget is available scenario
 				if (Q != null) {
-	//				System.out.println(Thread.currentThread().getName()+ "received Gadget:" +missionInfo.getGadget());
+	     			System.out.println(Thread.currentThread().getName()+ "received Gadget:" +missionInfo.getGadget());
 					boolean missioncomplete = false;
 
 					if (tickM < missionInfo.getTimeExpired()) {
@@ -111,12 +111,12 @@ public class M extends Subscriber {
 						missioncomplete = true;
 						SendAgentsEvent sendAgents = new SendAgentsEvent(income_mission.getMissionInfo().getSerialAgentsNumbers(), missionInfo.getDuration());
 						sendAgents.setSender(Thread.currentThread().getName());
-	//					System.out.println(sendAgents);
+						System.out.println(sendAgents);
 						Future<List<String>> FutureSendAgents  = getSimplePublisher().sendEvent(sendAgents);
-	//					System.out.println(Thread.currentThread().getName()+" ASKED to send the agents to execute mission");
+						System.out.println(Thread.currentThread().getName()+" ASKED to send the agents to execute mission");
 						List<String> agentsName= FutureSendAgents.get();
 						if (agentsName != null) {
-	//						System.out.println(Thread.currentThread().getName()+" has been notify that the agents sent");
+							System.out.println(Thread.currentThread().getName()+" has been notify that the agents sent");
 							Report report = new Report();
 							report.setGadgetName(getGadet.getRequested_gadget());
 							report.setMissionName(missionInfo.getMissionName());
@@ -125,12 +125,12 @@ public class M extends Subscriber {
 							report.setAgentsSerialNumbersNumber(missionInfo.getSerialAgentsNumbers());
 							report.setAgentsNames(agentsName);
 							report.setTimeIssued(missionInfo.getTimeIssued());
-			//				System.out.println("*******" + Q + "********");
+							System.out.println("*******" + Q + "********");
 							report.setQTime(Q);
 							report.setTimeCreated(tickM);
-		//					System.out.println(report);
+							System.out.println(report);
 							diary.addReport(report);
-	//						System.out.println("REPORT CREATED");
+							System.out.println("REPORT CREATED");
 							report.toString();
 							complete(income_mission,true);
 						}
@@ -141,8 +141,8 @@ public class M extends Subscriber {
 						RecallAgentsEvent MissionFail = new RecallAgentsEvent(missionInfo.getSerialAgentsNumbers());
 						MissionFail.setSender(Thread.currentThread().getName());
 						this.getSimplePublisher().sendEvent(MissionFail);
-		//				System.out.println(MissionFail);
-			//			System.out.println(Thread.currentThread().getName()+" send RecallAgentsEvent - due time issue");
+						System.out.println(MissionFail);
+						System.out.println(Thread.currentThread().getName()+" send RecallAgentsEvent - due time issue");
 						//endregion
 					}
 				}
@@ -153,8 +153,8 @@ public class M extends Subscriber {
 					RecallAgentsEvent MissionFail = new RecallAgentsEvent(missionInfo.getSerialAgentsNumbers());
 					MissionFail.setSender(Thread.currentThread().getName());
 					this.getSimplePublisher().sendEvent(MissionFail);
-		//			System.out.println(MissionFail);
-		//			System.out.println(Thread.currentThread().getName()+" send RecallAgentsEvent - due gadget issue");
+					System.out.println(MissionFail);
+					System.out.println(Thread.currentThread().getName()+" send RecallAgentsEvent - due gadget issue");
 				}
 				//endregion
 			}
@@ -163,14 +163,14 @@ public class M extends Subscriber {
 			//region Agents are not available scenario
 			else{
 				complete(income_mission,false);
-		//		System.out.println("agents isnt exist");
-		//		System.out.println("M did not received "+income_mission.getMissionInfo().getGadget());
+				System.out.println("agents isnt exist");
+				System.out.println("M did not received "+income_mission.getMissionInfo().getGadget());
 			}
 			//endregion
 		});
 		//endregion
 
-	//	System.out.println("M "+id+" is UP");
+		System.out.println("M "+id+" is UP");
 		countdown.countDown();
 	}
 

@@ -36,7 +36,7 @@ public class Intelligence extends Subscriber {
 			{ terminate(); }
 			if(br.getTickNum()>=0){
 				tick=br.getTickNum();
-		//		System.out.println(Thread.currentThread().getName()+" received broadcast at time "+tick);
+				System.out.println(Thread.currentThread().getName()+" received broadcast at time "+tick);
 				MissionReceivedEvent eventToSend=null;
 				for (int i=0 ; i<missions.size();i++) {
 					MissionInfo missioninfo = missions.get(i);
@@ -50,12 +50,12 @@ public class Intelligence extends Subscriber {
 				if(eventToSend!=null){
 					eventToSend.setSender(Thread.currentThread().getName());
 					super.getSimplePublisher().sendEvent(eventToSend);
-		//			System.out.println(eventToSend);
+					System.out.println(eventToSend);
 				}
 			}
 		});
 		//endregion
-		//System.out.println("Intelligence is UP");
+		System.out.println("Intelligence is UP");
 		countdown.countDown();
 	}
 }
