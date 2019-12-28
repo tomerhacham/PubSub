@@ -66,10 +66,10 @@ public class Squad {
 	 */
 	public void sendAgents(List<String> serials, int time){
 		try {
-			System.out.println("Execute Mission");
+			//System.out.println("Execute Mission");
 			sleep(time*100);
 			releaseAgents(serials);
-			System.out.println("Agents came back");
+		//	System.out.println(Thread.currentThread().getName()+" is AWAKE***********************");
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -82,16 +82,16 @@ public class Squad {
 	 */
 	public synchronized boolean getAgents(List<String> serials){
 		for (String serial: serials){
-			System.out.println(" check if agent is exist");
+			//System.out.println(" check if agent is exist");
 			if(!agents.containsKey(serial)){
-				System.out.println("agent isnt exist");
+				//System.out.println("agent isnt exist");
 				return false;
 			}
 		}
 			for (String serial: serials){
 				Agent agent= agents.get(serial);
 				while (!agent.isAvailable()){
-					System.out.println(agent.getName()+" is not available");
+					//System.out.println(agent.getName()+" is not available");
 					try {
 						wait();
 					} catch (InterruptedException e) {
@@ -99,7 +99,7 @@ public class Squad {
 					}
 				}
 				agent.acquire();
-				System.out.println(agent.Name+" acquired");
+				//System.out.println(agent.Name+" acquired");
 			}
 			return true;
 	}

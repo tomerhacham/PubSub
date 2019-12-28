@@ -131,6 +131,6 @@ public abstract class Subscriber extends RunnableSubPub {
             }
         }
         if(terminated){messageBroker.unregister(this);}
-        System.out.println(Thread.currentThread().getName()+" terminated");
+     //   System.out.println(Thread.currentThread().getName()+" terminated");
     }
 }

@@ -48,7 +48,7 @@ public class MessageBrokerImpl implements MessageBroker {
 			subscriberspool.add(m);
 			eventsPool.put(type,subscriberspool);
 		}*/
-		System.out.println(m.getName()+" subscribe to event: "+type.getSimpleName());
+	//	System.out.println(m.getName()+" subscribe to event: "+type.getSimpleName());
 
 	}
 
@@ -56,7 +56,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	public void subscribeBroadcast(Class<? extends Broadcast> type, Subscriber m) {
 		if(eventsPool.get(type)!= null){
 			eventsPool.get(type).add(m);
-			System.out.println(m.getName()+"---Added to existing pool");
+	//		System.out.println(m.getName()+"---Added to existing pool");
 		}
 		/*else{
 			ConcurrentLinkedQueue<Subscriber> subscriberspool = new ConcurrentLinkedQueue<>();
@@ -65,7 +65,7 @@ public class MessageBrokerImpl implements MessageBroker {
 			System.out.println(m.getName()+ "--- make NEW pool for the broadcast");
 
 		}*/
-		System.out.println(m.getName()+" subscribe to broadcast: "+type.getSimpleName());
+	//	System.out.println(m.getName()+" subscribe to broadcast: "+type.getSimpleName());
 
 	}
 
@@ -86,6 +86,10 @@ public class MessageBrokerImpl implements MessageBroker {
 			for(int i=0; i< subscriberQueue.size(); i++){
 				Subscriber sub = subscriberQueue.poll();
 				 LinkedBlockingQueue queue = queues.get(sub);
+				 if(queue==null){
+					 register(sub);
+				 }
+				queue = queues.get(sub);
 				try {
 					queue.put(b);
 					subscriberQueue.add(sub);
@@ -105,6 +109,7 @@ public class MessageBrokerImpl implements MessageBroker {
 		if (pool!=null) {
 			if (!pool.isEmpty()) {
 				Subscriber sub = pool.poll();
+				if(sub!=null){
 				pool.add(sub);
 				futures.put(e, future);
 				try {
@@ -112,11 +117,13 @@ public class MessageBrokerImpl implements MessageBroker {
 					if (queue == null) {
 						register(sub);
 					}
+					queue = queues.get(sub);
 					queue.put(e);
 					/*System.out.println("------- Queue of "+sub.getName());
 					PrintSubscriberQueue(queue);*/
 				} catch (InterruptedException ex) {
 					ex.printStackTrace();
+				}
 				}
 			}
 			else {
@@ -137,7 +144,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	public void register(Subscriber m) {
 		LinkedBlockingQueue<Message> queue = new LinkedBlockingQueue<>();
 		queues.put(m,queue);
-		System.out.println(m.getName()+" register");
+	//	System.out.println(m.getName()+" register");
 	}
 
 	@Override
@@ -155,7 +162,7 @@ public class MessageBrokerImpl implements MessageBroker {
 				}
 			}
 		}
-		System.out.println(m.getName()+" unregister");
+	//	System.out.println(m.getName()+" unregister");
 
 
 	}
@@ -168,7 +175,7 @@ public class MessageBrokerImpl implements MessageBroker {
 
 	private void printQueue(ConcurrentLinkedQueue<Subscriber> queue){
 		for (Subscriber sub:queue) {
-			System.out.println(sub.getName());
+	//		System.out.println(sub.getName());
 		}
 	}
 
@@ -214,7 +221,7 @@ public class MessageBrokerImpl implements MessageBroker {
 
 	private void PrintSubscriberQueue(LinkedBlockingQueue<Message> queue){
 		for (Message message:queue) {
-			System.out.print(message.getClass().getSimpleName()+ ", ");
+	//		System.out.print(message.getClass().getSimpleName()+ ", ");
 		}
 	}
 

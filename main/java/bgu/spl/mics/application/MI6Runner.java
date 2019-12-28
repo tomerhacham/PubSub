@@ -118,14 +118,14 @@ public class MI6Runner {
         }
         try {
             countDown.await();
-            System.out.println("-------------ALL PROCESS ARE UP--------------");
+     //       System.out.println("-------------ALL PROCESS ARE UP--------------");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         time_service_thread.start();
         //endregion
 
-       System.out.println("join to all");
+     //  System.out.println("join to all");
         threads.add(time_service_thread);
         for (Thread thread:threads) {
             try {
@@ -139,11 +139,11 @@ public class MI6Runner {
         Diary.getInstance().printToFile("Diary");
         //endregion
 
-        System.out.println("----------------------END STATUS-----------------------");
+/*        System.out.println("----------------------END STATUS-----------------------");
         for (Thread thread:threads) {
             System.out.println("Alive status of "+thread.getName()+": "+thread.isAlive());
         }
-        System.out.println("----------------------THE END--------------------------");;
+        System.out.println("----------------------THE END--------------------------");;*/
 
 
     }
@@ -152,7 +152,7 @@ public class MI6Runner {
         int Moneypenny = ((Long)services.get("Moneypenny")).intValue();
         int intelligence = ((JSONArray)services.get("intelligence")).size();
         int Q = 1;
-        System.out.println("All proccess: "+(M+Moneypenny+intelligence+Q));
+     //   System.out.println("All proccess: "+(M+Moneypenny+intelligence+Q));
         return M+Moneypenny+intelligence+Q;
     }
 

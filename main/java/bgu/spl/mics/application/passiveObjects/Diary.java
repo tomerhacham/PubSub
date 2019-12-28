@@ -67,66 +67,60 @@ public class Diary {
 
 		JSONArray reports = new JSONArray();
 
-		int missionIndex = 0;
-		for(Report OurReport : this.reports){
+		int missinsarray_index = 0;
+		for(Report report : this.reports){
 
-			JSONObject report = new JSONObject();
-
-			report.put("missionName",OurReport.getMissionName());
-			report.put("m",OurReport.getM());
-			report.put("moneypenny",OurReport.getMoneypenny());
+			JSONObject report_json_object = new JSONObject();
 
 			JSONArray agentsSerialNumber = new JSONArray();
-			int agentIndex = 0;
-			for(String agentSerialNumber : OurReport.getAgentsSerialNumbersNumber()){
-				agentsSerialNumber.add(agentIndex,agentSerialNumber);
-				agentIndex++;
+			int agentarray_index = 0;
+			for(String serialNumber : report.getAgentsSerialNumbersNumber()){
+				agentsSerialNumber.add(agentarray_index, serialNumber);
+				agentarray_index++;
 			}
-			report.put("agentsSerialNumbers",agentsSerialNumber);
 
 			JSONArray agentsNames = new JSONArray();
-			agentIndex = 0;
-			for(String agentName : OurReport.getAgentsNames()){
-				agentsNames.add(agentIndex,agentName);
-				agentIndex++;
+			agentarray_index = 0;
+			for(String agentName : report.getAgentsNames()){
+				agentsNames.add(agentarray_index,agentName);
+				agentarray_index++;
 			}
-			report.put("agentsName",agentsNames);
 
-			report.put("gadgetName",OurReport.getGadgetName());
-			report.put("timeCreated",OurReport.getTimeCreated());
-			report.put("timeIssued",OurReport.getTimeIssued());
-			report.put("qTime",OurReport.getQTime());
+			fillReport(report, report_json_object, agentsSerialNumber, agentsNames);
 
-			reports.add(missionIndex,report);
-			missionIndex++;
+			reports.add(missinsarray_index, report_json_object);
+			missinsarray_index++;
 		}
 
-		JSONObject totalobject = new JSONObject();
-		totalobject.put("total",total);
+		finalDiary.put("reports",reports);
+		finalDiary.put("total",total);
 
-		JSONObject allreports = new JSONObject();
-		allreports.put("reports",reports);
-
-		JSONArray FINAL = new JSONArray();
-		FINAL.add(allreports);
-		FINAL.add(totalobject);
-
-
-		//finalDiary.put("reports",reports);
-		//finalDiary.put("total",total);
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		JsonParser jp = new JsonParser();
-		JsonElement je = jp.parse(FINAL.toJSONString());
-		String prettyJsonString = gson.toJson(je);
-
+		String prettyJsonString = getBeautifulString(finalDiary);
 
 		try (FileWriter file = new FileWriter(filename + ".json")) {
 			file.write(prettyJsonString);
-			file.flush();
-			file.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private String getBeautifulString(JSONObject finalDiary) {
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		JsonParser jp = new JsonParser();
+		JsonElement je = jp.parse(finalDiary.toJSONString());
+		return gson.toJson(je);
+	}
+
+	private void fillReport(Report report, JSONObject report_json_object, JSONArray agentsSerialNumber, JSONArray agentsNames) {
+		report_json_object.put("agentsSerialNumbers",agentsSerialNumber);
+		report_json_object.put("missionName",report.getMissionName());
+		report_json_object.put("m",report.getM());
+		report_json_object.put("moneypenny",report.getMoneypenny());
+		report_json_object.put("agentsName",agentsNames);
+		report_json_object.put("gadgetName",report.getGadgetName());
+		report_json_object.put("timeCreated",report.getTimeCreated());
+		report_json_object.put("timeIssued",report.getTimeIssued());
+		report_json_object.put("qTime",report.getQTime());
 	}
 
 	/**
