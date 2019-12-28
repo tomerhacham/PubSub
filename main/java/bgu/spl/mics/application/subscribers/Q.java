@@ -48,7 +48,7 @@ public class Q extends Subscriber {
 				System.out.println("Q supplied "+requested_gadget);
 				}
 			else{
-				complete(event,-1);
+				complete(event,null);
 				System.out.println("Q did not supplied "+requested_gadget);
 				}
 			System.out.println("GadgetAvailableEvent COMPLETE");

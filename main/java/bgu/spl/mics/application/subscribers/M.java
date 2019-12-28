@@ -97,7 +97,7 @@ public class M extends Subscriber {
 				System.out.println(Thread.currentThread().getName() + " sent GadgetAvailableEvent: " + getGadet.getRequested_gadget());
 				Integer Q= FutureQ.get();
 
-				if (Q != -1) {
+				if (Q != null) {
 					System.out.println(Thread.currentThread().getName()+ "received Gadget:" +missionInfo.getGadget());
 					boolean missioncomplete = false;
 
@@ -135,7 +135,7 @@ public class M extends Subscriber {
 						MissionFail.setSender(Thread.currentThread().getName());
 						this.getSimplePublisher().sendEvent(MissionFail);
 						System.out.println(MissionFail);
-						System.out.println(Thread.currentThread().getName()+" send RecallAgentsEvent");
+						System.out.println(Thread.currentThread().getName()+" send RecallAgentsEvent - due time issue");
 					}
 				}
 				else {
@@ -143,7 +143,7 @@ public class M extends Subscriber {
 					MissionFail.setSender(Thread.currentThread().getName());
 					this.getSimplePublisher().sendEvent(MissionFail);
 					System.out.println(MissionFail);
-					System.out.println(Thread.currentThread().getName()+" send RecallAgentsEvent");
+					System.out.println(Thread.currentThread().getName()+" send RecallAgentsEvent - due gadget issue");
 				}
 			}
 			else{

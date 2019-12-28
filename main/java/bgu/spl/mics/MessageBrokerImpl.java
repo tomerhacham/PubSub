@@ -100,19 +100,16 @@ public class MessageBrokerImpl implements MessageBroker {
 
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
-		Future<T> future = null;
+		Future<T> future = new Future<>();;
 		ConcurrentLinkedQueue<Subscriber> pool =  eventsPool.get(e.getClass());
-		//System.out.println("--Pool for Event:");
-		//printQueue(pool);
-		if (pool!=null){
-			if(!pool.isEmpty()) {
+		if (pool!=null) {
+			if (!pool.isEmpty()) {
 				Subscriber sub = pool.poll();
 				pool.add(sub);
-				future=new Future<>();
-				futures.put(e,future);
+				futures.put(e, future);
 				try {
 					LinkedBlockingQueue queue = queues.get(sub);
-					if(queue==null){
+					if (queue == null) {
 						register(sub);
 					}
 					queue.put(e);
@@ -122,10 +119,19 @@ public class MessageBrokerImpl implements MessageBroker {
 					ex.printStackTrace();
 				}
 			}
+			else {
+				future = new Future<>();
+				futures.put(e, future);
+				if (e.getClass().getSimpleName().equals("AgentsAvailableEvent")) {
+					complete(e,null);
+				}
+				else if (e.getClass().getSimpleName().equals("GadgetAvailableEvent")) {
+					complete(e,null);
+				}
+			}
 		}
 		return future;
 	}
-
 
 	@Override
 	public void register(Subscriber m) {
@@ -148,13 +154,7 @@ public class MessageBrokerImpl implements MessageBroker {
 					futures.get(event).resolve(-1);
 				}
 			}
-			/*BlockingQueue<Message> subscriberQueue = queues.get(m);
-			for(Message message: subscriberQueue){
-				if(futures.get(message)!=null){
-					futures.get(message).resolve(-1);
-					}
-				}*/
-			}
+		}
 		System.out.println(m.getName()+" unregister");
 
 
