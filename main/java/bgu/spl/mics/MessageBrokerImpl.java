@@ -158,7 +158,7 @@ public class MessageBrokerImpl implements MessageBroker {
 			if(m.getName().contains("moneypenny")){
 				List<Event> events= ((Moneypenny)m).getEvent();
 				for(Event event:events){
-					futures.get(event).resolve(-1);
+					futures.get(event).resolve(null);
 				}
 			}
 		}
