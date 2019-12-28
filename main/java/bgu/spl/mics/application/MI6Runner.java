@@ -135,8 +135,8 @@ public class MI6Runner {
             }
         }
         //region Output to Json
-        Inventory.getInstance().printToFile("inventory");
-        Diary.getInstance().printToFile("Diary");
+        Inventory.getInstance().printToFile(args[1]);
+        Diary.getInstance().printToFile(args[2]);
         //endregion
 
         System.out.println("----------------------END STATUS-----------------------");

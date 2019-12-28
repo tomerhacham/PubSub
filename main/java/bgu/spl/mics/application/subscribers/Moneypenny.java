@@ -51,8 +51,8 @@ public class Moneypenny extends Subscriber {
 			//region Broadcast handle
 			subscribeBroadcast(TickBroadcast.class, br -> {
 				if (br.isTermminate()) {
-					//squad.releaseAgents(squad.getAgentsSerials());
-					squad.releaseAgents(new LinkedList<>());
+					squad.releaseAgents(squad.getAgentsSerials());
+					//squad.releaseAgents(new LinkedList<>());
 					terminate();
 				}
 				if (br.getTickNum() >= 0) {
@@ -86,8 +86,8 @@ public class Moneypenny extends Subscriber {
 			//region Broadcast handle
 			subscribeBroadcast(TickBroadcast.class, br -> {
 				if (br.isTermminate()) {
-			//		squad.releaseAgents(squad.getAgentsSerials());
-					squad.releaseAgents(new LinkedList<>());
+					squad.releaseAgents(squad.getAgentsSerials());
+					//squad.releaseAgents(new LinkedList<>());
 					terminate();
 				}
 				if (br.getTickNum() >= 0) {
@@ -103,8 +103,8 @@ public class Moneypenny extends Subscriber {
 				System.out.println(Send_agents);
 				System.out.println(Thread.currentThread().getName()+"received SendAgentsEvent");
 				events.add(Send_agents);
-				complete(Send_agents, squad.getAgentsNames(Send_agents.GetSerialAgentsNumbers()));
 				squad.sendAgents(Send_agents.GetSerialAgentsNumbers(), Send_agents.getTimeToSleep());
+				complete(Send_agents, squad.getAgentsNames(Send_agents.GetSerialAgentsNumbers()));
 				System.out.println("***callback:" + Thread.currentThread().getName() + " SendAgentsEvent " + Send_agents.GetSerialAgentsNumbers().toString() + " COMPLETE");
 
 			});
