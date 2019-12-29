@@ -103,7 +103,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	}
 
 	@Override
-	public <T> Future<T> sendEvent(Event<T> e) {
+	public synchronized <T> Future<T> sendEvent(Event<T> e) {
 		Future<T> future = new Future<>();;
 		ConcurrentLinkedQueue<Subscriber> pool =  eventsPool.get(e.getClass());
 		if (pool!=null) {
