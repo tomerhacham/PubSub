@@ -20,7 +20,7 @@ public class Q extends Subscriber {
 	//Fields:
 	private Inventory inventory;
 	private CountDownLatch countdown;
-	private int tick = 0;
+	private int tick = 1;
 	private int Minstance;
 
 	public Q(CountDownLatch countdown, int Minstance) {

@@ -78,29 +78,30 @@ public class MessageBrokerImpl implements MessageBroker {
 	}
 
 	@Override
-	public void sendBroadcast(Broadcast b) {
+	public synchronized void sendBroadcast(Broadcast b) {
 		ConcurrentLinkedQueue<Subscriber> subscriberQueue = eventsPool.get(b.getClass());
 		//System.out.println("--for Broadcast:");
 		//printQueue(subscriberQueue);
 		if(subscriberQueue!=null) {
 			for(int i=0; i< subscriberQueue.size(); i++){
 				Subscriber sub = subscriberQueue.poll();
-				 LinkedBlockingQueue queue = queues.get(sub);
-				 if(queue==null){
-					 register(sub);
-				 }
-				queue = queues.get(sub);
-				try {
-					queue.put(b);
-					subscriberQueue.add(sub);
+					LinkedBlockingQueue queue = queues.get(sub);
+					if (queue == null) {
+						register(sub);
+					}
+					queue = queues.get(sub);
+					try {
+						queue.put(b);
+						subscriberQueue.add(sub);
 					/*System.out.println("------- Queue of "+sub.getName());;
 					PrintSubscriberQueue(queue);*/
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
+
 			}
 		}
-	}
 
 	@Override
 	public synchronized <T> Future<T> sendEvent(Event<T> e) {

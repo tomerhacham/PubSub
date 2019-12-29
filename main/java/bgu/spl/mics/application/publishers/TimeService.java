@@ -39,21 +39,18 @@ public class TimeService extends Publisher {
 	public void run() {
 		initialize();
 		while (tick <= duration) {
-			SimplePublisher simplePublisher = this.getSimplePublisher();
 			TickBroadcast tickBroadcast = new TickBroadcast(tick);
-			if (tick==duration){tickBroadcast.setTermminate(true);}
-			simplePublisher.sendBroadcast(tickBroadcast);
+			if(tick==duration){tickBroadcast.setTermminate(true);}
+			getSimplePublisher().sendBroadcast(tickBroadcast);
 			System.out.println("------------------"+getName() + " publish a broadcast " + tick);
 			tick++;
 			try {
 				Thread.currentThread().sleep(100);
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 		System.out.println("Time Service terminate");
-		TickBroadcast tickBroadcast = new TickBroadcast(tick);
-		tickBroadcast.setTermminate(true);
-		getSimplePublisher().sendBroadcast(tickBroadcast);
 	}
 }

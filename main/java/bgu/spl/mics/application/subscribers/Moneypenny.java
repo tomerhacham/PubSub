@@ -46,6 +46,7 @@ public class Moneypenny extends Subscriber {
 		//region MwentHome  handle
 		subscribeBroadcast(MwentHome.class, br -> {
 			Minstance--;
+			System.out.println(this.getName()+" ------------------------terminate " + this.Minstance);
 			if (Minstance==0) {
 				terminate();
 			}
