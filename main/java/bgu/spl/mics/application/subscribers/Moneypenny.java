@@ -31,7 +31,7 @@ public class Moneypenny extends Subscriber {
 	private CountDownLatch countdown;
 	private Squad squad = Squad.getInstance();
 	private LinkedList<Event> events;
-	boolean isSpecial;
+	private boolean isSpecial;
 
 	//Constructor:
 	public Moneypenny(int id, CountDownLatch countdown,boolean special) {
