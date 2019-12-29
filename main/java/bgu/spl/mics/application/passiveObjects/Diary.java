@@ -97,7 +97,7 @@ public class Diary {
 
 		String prettyJsonString = getBeautifulString(finalDiary);
 
-		try (FileWriter file = new FileWriter(filename + ".json")) {
+		try (FileWriter file = new FileWriter(filename)) {
 			file.write(prettyJsonString);
 		} catch (IOException e) {
 			e.printStackTrace();

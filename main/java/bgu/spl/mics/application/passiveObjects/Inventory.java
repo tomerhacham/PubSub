@@ -80,7 +80,7 @@ public class Inventory {
 		JSONArray array = new JSONArray();
 		array.addAll(gadgets);
 		//Write JSON file
-		try (FileWriter file = new FileWriter(filename+".json")) {
+		try (FileWriter file = new FileWriter(filename)) {
 
 			file.write(array.toJSONString());
 			file.flush();
