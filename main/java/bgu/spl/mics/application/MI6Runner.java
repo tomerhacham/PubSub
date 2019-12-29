@@ -59,7 +59,7 @@ public class MI6Runner {
         Long M = (Long)services.get("M");
         for(int i=0;i<Moneypenny;i++){
             Moneypenny moneypenny;
-            if(i==0){moneypenny= new Moneypenny(i+1,countDown,true,M.intValue());}
+            if(i<Moneypenny/2){moneypenny= new Moneypenny(i+1,countDown,true,M.intValue());}
             else{moneypenny= new Moneypenny(i+1,countDown,false,M.intValue());}
                 Thread moneypenny_thread = new Thread(moneypenny);
                 moneypenny_thread.setName("Moneypenny "+(i+1));
