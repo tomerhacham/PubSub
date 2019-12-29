@@ -52,11 +52,13 @@ public class Squad {
 	/**
 	 * Releases agents.
 	 */
-	public synchronized void releaseAgents(List<String> serials){
+	public void releaseAgents(List<String> serials){
+		Collections.sort(serials);
 		for (String SerialNum:serials) {
-			this.agents.get(SerialNum).release();
+			synchronized (this.agents.get(SerialNum)) {
+				this.agents.get(SerialNum).release();
+			}
 		}
-		notifyAll();
 	}
 
 	/**
@@ -64,6 +66,7 @@ public class Squad {
 	 * @param time   milliseconds to sleep
 	 */
 	public void sendAgents(List<String> serials, int time){
+		Collections.sort(serials);
 		try {
 			//System.out.println("Execute Mission");
 			sleep(time*100);
@@ -79,25 +82,28 @@ public class Squad {
 	 * @param serials   the serial numbers of the agents
 	 * @return ‘false’ if an agent of serialNumber ‘serial’ is missing, and ‘true’ otherwise
 	 */
-	public synchronized boolean getAgents(List<String> serials){
+	public boolean getAgents(List<String> serials){
+		Collections.sort(serials);
 		for (String serial: serials){
 			//System.out.println(" check if agent is exist");
 			if(!agents.containsKey(serial)){
-				//System.out.println("agent isnt exist");
+				System.out.println("agent isnt exist - hadar");
 				return false;
 			}
 		}
 			for (String serial: serials){
 				Agent agent= agents.get(serial);
-				while (!agent.isAvailable()){
-					//System.out.println(agent.getName()+" is not available");
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						  e.printStackTrace();
+				synchronized(agent) {
+					while (!agent.isAvailable()) {
+						//System.out.println(agent.getName()+" is not available");
+						try {
+							agent.wait();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
+					agent.acquire();
 				}
-				agent.acquire();
 				//System.out.println(agent.Name+" acquired");
 			}
 			return true;
@@ -109,7 +115,8 @@ public class Squad {
      * @return a list of the names of the agents with the specified serials.
      */
     public  List<String> getAgentsNames(List<String> serials){
-    	LinkedList<String> group= new LinkedList<>() ;
+		Collections.sort(serials);
+		LinkedList<String> group= new LinkedList<>() ;
     	for (String serial: serials){
 			group.add(this.agents.get(serial).getName());
 		}

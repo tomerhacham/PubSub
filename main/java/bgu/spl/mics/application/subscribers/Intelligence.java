@@ -43,15 +43,17 @@ public class Intelligence extends Subscriber {
 					if (missioninfo.getTimeIssued()==tick){
 						eventToSend = new MissionReceivedEvent(missioninfo);
 						missions.remove(missioninfo);
+						if(eventToSend!=null){
+							eventToSend.setSender(Thread.currentThread().getName());
+							getSimplePublisher().sendEvent(eventToSend);
+							System.out.println(eventToSend);
+						}
 
 					}
 
+
 				}
-				if(eventToSend!=null){
-					eventToSend.setSender(Thread.currentThread().getName());
-					super.getSimplePublisher().sendEvent(eventToSend);
-					System.out.println(eventToSend);
-				}
+
 			}
 		});
 		//endregion

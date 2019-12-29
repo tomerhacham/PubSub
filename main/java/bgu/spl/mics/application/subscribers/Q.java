@@ -2,6 +2,7 @@ package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.Subscriber;
 import bgu.spl.mics.application.messages.GadgetAvailableEvent;
+import bgu.spl.mics.application.messages.MwentHome;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 
@@ -20,20 +21,28 @@ public class Q extends Subscriber {
 	private Inventory inventory;
 	private CountDownLatch countdown;
 	private int tick = 0;
+	private int Minstance;
 
-	public Q(CountDownLatch countdown) {
+	public Q(CountDownLatch countdown, int Minstance) {
 		super("Q");
 		this.inventory = Inventory.getInstance();
 		this.countdown=countdown;
+		this.Minstance=Minstance;
 	}
 
 	@Override
 	protected void initialize() {
-		//region Broadcast handler
-		subscribeBroadcast(TickBroadcast.class, br -> {
-			if (br.isTermminate()) {
+		//region MwentHome  handle
+		subscribeBroadcast(MwentHome.class, br -> {
+			Minstance--;
+			if (Minstance==0) {
 				terminate();
 			}
+		});
+		//endregion
+
+		//region Broadcast handler
+		subscribeBroadcast(TickBroadcast.class, br -> {
 			if (br.getTickNum() >= 0) {
 				tick = br.getTickNum();
 				System.out.println("Qtick = "+tick);
@@ -44,26 +53,21 @@ public class Q extends Subscriber {
 
 		//region GadgetAvailableEvent handler
 		subscribeEvent(GadgetAvailableEvent.class, event ->{
-			/*try {
-				sleep(5);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}*/
 			event.setReceiver(Thread.currentThread().getName());
-						System.out.println(event);
-			System.out.println("***callback:"+Thread.currentThread().getName()+ " GadgetAvailableEvent: " + event.hashCode());
+			System.out.println(event);
+			//System.out.println("***callback:"+Thread.currentThread().getName()+ " GadgetAvailableEvent: " + event.hashCode());
 			String requested_gadget=event.getRequested_gadget();
 			if(inventory.getItem(requested_gadget)){
 				complete(event,tick);
-				System.out.println("----------------Q tick at complete "+ tick);
+				//System.out.println("----------------Q tick at complete "+ tick);
 				System.out.println("Q supplied "+requested_gadget);
 				}
 			else{
 				complete(event,null);
-				System.out.println("----------------Q tick at complete "+ tick);
+				//System.out.println("----------------Q tick at complete "+ tick);
 						System.out.println("Q did not supplied "+requested_gadget);
 				}
-			System.out.println("GadgetAvailableEvent COMPLETE");
+			//System.out.println("GadgetAvailableEvent COMPLETE");
 		});
 		//endregion
 

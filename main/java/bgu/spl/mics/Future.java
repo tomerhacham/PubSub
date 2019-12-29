@@ -12,20 +12,21 @@ import java.util.concurrent.TimeUnit;
  */
 public class Future<T> {
 	private T result = null;
-	boolean isdone= false;
-	
+	private boolean isdone= false;
+	private String kind;
+
 	/**
 	 * This should be the the only public constructor in this class.
 	 */
 	public Future() {}
-	
+
 	/**
      * retrieves the result the Future object holds if it has been resolved.
      * This is a blocking method! It waits for the computation in case it has
      * not been completed.
      * <p>
      * @return return the result of type T if it is available, if not wait until it is available.
-     * 	       
+     *
      */
 	public synchronized T get() {
 		while(!isDone()){
@@ -37,7 +38,7 @@ public class Future<T> {
 		}
 		return result;
 	}
-	
+
 	/**
      * Resolves the result of this Future object.
      */
@@ -46,14 +47,14 @@ public class Future<T> {
 		this.result=result;
 		notifyAll();
 	}
-	
+
 	/**
      * @return true if this object has been resolved, false otherwise
      */
 	public boolean isDone() {
 		return isdone;
 	}
-	
+
 	/**
      * retrieves the result the Future object holds if it has been resolved,
      * This method is non-blocking, it has a limited amount of time determined
@@ -61,20 +62,24 @@ public class Future<T> {
      * <p>
      * @param timeout 	the maximal amount of time units to wait for the result.
      * @param unit		the {@link TimeUnit} time units to wait.
-     * @return return the result of type T if it is available, if not, 
+     * @return return the result of type T if it is available, if not,
      * 	       wait for {@code timeout} TimeUnits {@code unit}. If time has
      *         elapsed, return null.
      */
 	public T get(long timeout, TimeUnit unit) {
-		while (!isDone()){
+		if (!isDone()){
 			try {
-				unit.sleep(timeout);
+				unit.sleep(timeout*100);
 			}
 			catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 		return result;
+	}
+
+	public void setKind(String kind) {
+		this.kind = kind;
 	}
 
 }

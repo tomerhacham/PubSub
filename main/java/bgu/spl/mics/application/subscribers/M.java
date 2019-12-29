@@ -40,7 +40,10 @@ public class M extends Subscriber {
 		//region Broadcast handler
 		subscribeBroadcast(TickBroadcast.class , br -> {
 			if (br.isTermminate())
-			{ terminate(); }
+			{
+				MwentHome mwentHome = new MwentHome();
+				getSimplePublisher().sendBroadcast(mwentHome);
+				terminate(); }
 			if(br.getTickNum()>=0){
 				tickM=br.getTickNum();
 				System.out.println(Thread.currentThread().getName()+" received broadcast at time "+tickM);
@@ -50,37 +53,6 @@ public class M extends Subscriber {
 
 		//region MissionReceivedEvent handler
 		subscribeEvent(MissionReceivedEvent.class, income_mission->{
-/*			income_mission.setReceiver(Thread.currentThread().getName());
-			System.out.println(income_mission);
-			AgentsAvailableEvent agentsAvailableEvent = new AgentsAvailableEvent(income_mission.getMissionInfo().getSerialAgentsNumbers());
-			agentsAvailableEvent.setSender(Thread.currentThread().getName());
-			Future<Integer> future_AgentAvailableEvent = getSimplePublisher().sendEvent(agentsAvailableEvent);
-
-			GadgetAvailableEvent gadgetAvailableEvent = new GadgetAvailableEvent(income_mission.getMissionInfo().getGadget());
-			gadgetAvailableEvent.setSender(Thread.currentThread().getName());
-			Future<Integer> future_gadgetAvailableEvent = getSimplePublisher().sendEvent(gadgetAvailableEvent);
-
-
-			if(future_AgentAvailableEvent.get()!= null){
-				if(future_gadgetAvailableEvent.get()>0) {
-					if(tickM<=income_mission.getMissionInfo().getTimeExpired()) {
-						SendAgentsEvent sendAgentsEvent = new SendAgentsEvent(income_mission.getMissionInfo().getSerialAgentsNumbers(), income_mission.getMissionInfo().getDuration());
-						sendAgentsEvent.setSender(Thread.currentThread().getName());
-						getSimplePublisher().sendEvent(sendAgentsEvent);
-						//TODO: add reports details
-					}
-					else{
-						RecallAgentsEvent recallAgentsEvent = new RecallAgentsEvent(income_mission.getMissionInfo().getSerialAgentsNumbers());
-						recallAgentsEvent.setSender(Thread.currentThread().getName());
-						getSimplePublisher().sendEvent(recallAgentsEvent);
-					}
-				}
-				else{
-					RecallAgentsEvent recallAgentsEvent = new RecallAgentsEvent(income_mission.getMissionInfo().getSerialAgentsNumbers());
-					recallAgentsEvent.setSender(Thread.currentThread().getName());
-					getSimplePublisher().sendEvent(recallAgentsEvent);
-				}
-			}*/
 			System.out.println("tickM = "+tickM);
 			diary.increment();
 			income_mission.setReceiver(Thread.currentThread().getName());
@@ -88,36 +60,43 @@ public class M extends Subscriber {
 			AgentsAvailableEvent getAgents = new AgentsAvailableEvent(income_mission.getMissionInfo().getSerialAgentsNumbers());
 			getAgents.setSender(Thread.currentThread().getName());
 			Future<Integer> FutureMP = getSimplePublisher().sendEvent(getAgents);
+			FutureMP.setKind("FutureMP");
 			System.out.println(getAgents);
 			MissionInfo missionInfo = income_mission.getMissionInfo();
-			Integer MP= FutureMP.get();
+			Integer MP= FutureMP.get();//missionInfo.getDuration(),TimeUnit.MILLISECONDS);
 
 			//region Agents are available scenario
-			if(MP!= null) {
-				System.out.println("tick: "+tickM+" "+Thread.currentThread().getName() + " received AgentAvailableEvent: " + income_mission.getMissionInfo().getSerialAgentsNumbers().toString());
+			if (MP != null) {
+				System.out.println("tick: " + tickM + " " + Thread.currentThread().getName() + " received AgentAvailableEvent: " + income_mission.getMissionInfo().getSerialAgentsNumbers().toString());
 				GadgetAvailableEvent getGadet = new GadgetAvailableEvent(income_mission.getMissionInfo().getGadget());
 				getGadet.setSender(Thread.currentThread().getName());
 				System.out.println(getGadet);
 				Future<Integer> FutureQ = getSimplePublisher().sendEvent(getGadet);
+				FutureQ.setKind("FutureQ");
 				System.out.println(Thread.currentThread().getName() + " sent GadgetAvailableEvent: " + getGadet.getRequested_gadget());
-				Integer Q= FutureQ.get();
+				Integer Q = FutureQ.get();
 
 				//region Gadget is available scenario
 				if (Q != null) {
-	     			System.out.println(Thread.currentThread().getName()+ "received Gadget:" +missionInfo.getGadget());
+					System.out.println(Thread.currentThread().getName() + "received Gadget:" + missionInfo.getGadget());
 					boolean missioncomplete = false;
 
-					if (tickM < missionInfo.getTimeExpired()) {
+					if (Q < duration && Q <= missionInfo.getTimeExpired()) {
 						//region Execute Mission
-						missioncomplete = true;
-						SendAgentsEvent sendAgents = new SendAgentsEvent(income_mission.getMissionInfo().getSerialAgentsNumbers(), missionInfo.getDuration());
+						int toSend = 0;
+						if (Q + missionInfo.getDuration() > duration) {
+							toSend = (duration - Q);
+						} else {
+							toSend = missionInfo.getDuration();
+						}
+						SendAgentsEvent sendAgents = new SendAgentsEvent(income_mission.getMissionInfo().getSerialAgentsNumbers(), missionInfo.getDuration());//toSend);
 						sendAgents.setSender(Thread.currentThread().getName());
 						System.out.println(sendAgents);
-						Future<List<String>> FutureSendAgents  = getSimplePublisher().sendEvent(sendAgents);
-						System.out.println(Thread.currentThread().getName()+" ASKED to send the agents to execute mission");
-						List<String> agentsName= FutureSendAgents.get();
+
+						Future<List<String>> FutureSendAgents = getSimplePublisher().sendEvent(sendAgents);
+						System.out.println(Thread.currentThread().getName() + " ASKED to send the agents to execute mission");
+						List<String> agentsName = FutureSendAgents.get();
 						if (agentsName != null) {
-							System.out.println(Thread.currentThread().getName()+" has been notify that the agents sent");
 							Report report = new Report();
 							report.setGadgetName(getGadet.getRequested_gadget());
 							report.setMissionName(missionInfo.getMissionName());
@@ -126,48 +105,34 @@ public class M extends Subscriber {
 							report.setAgentsSerialNumbersNumber(missionInfo.getSerialAgentsNumbers());
 							report.setAgentsNames(agentsName);
 							report.setTimeIssued(missionInfo.getTimeIssued());
-							System.out.println("*******" + Q + "********");
+							//System.out.println("*******" + Q + "********");
 							report.setQTime(Q);
 							report.setTimeCreated(tickM);
 							System.out.println(report);
 							diary.addReport(report);
 							System.out.println("REPORT CREATED");
-							//report.toString();
-							complete(income_mission,true);
+							complete(income_mission, true);
 						}
-						//endregion
-					}
-					if (missioncomplete && missionInfo.getDuration() + tickM > duration) {
-						//region Abort Mission scenario
+					} else {
 						RecallAgentsEvent MissionFail = new RecallAgentsEvent(missionInfo.getSerialAgentsNumbers());
 						MissionFail.setSender(Thread.currentThread().getName());
 						this.getSimplePublisher().sendEvent(MissionFail);
 						System.out.println(MissionFail);
-						System.out.println(Thread.currentThread().getName()+" send RecallAgentsEvent - due time issue");
-						//endregion
+						System.out.println(Thread.currentThread().getName() + " send RecallAgentsEvent - due time issue");
 					}
-				}
-				//endregion
-
-				//region Gadget is not available scenario
-				else {
+				} else {
 					RecallAgentsEvent MissionFail = new RecallAgentsEvent(missionInfo.getSerialAgentsNumbers());
 					MissionFail.setSender(Thread.currentThread().getName());
 					this.getSimplePublisher().sendEvent(MissionFail);
 					System.out.println(MissionFail);
-					System.out.println(Thread.currentThread().getName()+" send RecallAgentsEvent - due gadget issue");
+					System.out.println(Thread.currentThread().getName() + " send RecallAgentsEvent - due gadget issue");
 				}
-				//endregion
-			}
-			//endregion
 
-			//region Agents are not available scenario
-			else{
-				complete(income_mission,false);
-				System.out.println("agents isnt exist");
-				System.out.println("M did not received "+income_mission.getMissionInfo().getGadget());
+				//endregion
+			} else {
+				System.out.println("M did not received " + missionInfo.getSerialAgentsNumbers());
+				complete(income_mission, false);
 			}
-			//endregion
 		});
 		//endregion
 

@@ -188,6 +188,7 @@ public class MessageBrokerImpl implements MessageBroker {
 		ConcurrentLinkedQueue<Subscriber> MissionReceivedEventPool = new ConcurrentLinkedQueue<>();
 		ConcurrentLinkedQueue<Subscriber> RecallAgentsEventPool = new ConcurrentLinkedQueue<>();
 		ConcurrentLinkedQueue<Subscriber> SendAgentsEventPool = new ConcurrentLinkedQueue<>();
+		ConcurrentLinkedQueue<Subscriber> MwentHomePool = new ConcurrentLinkedQueue<>();
 
 		pools.add(TickBroadcastPool);
 		pools.add(AgentAvailablePool);
@@ -195,6 +196,7 @@ public class MessageBrokerImpl implements MessageBroker {
 		pools.add(MissionReceivedEventPool);
 		pools.add(RecallAgentsEventPool);
 		pools.add(SendAgentsEventPool);
+		pools.add(MwentHomePool);
 
 		return pools;
 	}
@@ -208,6 +210,7 @@ public class MessageBrokerImpl implements MessageBroker {
 		RecallAgentsEvent recallAgentsEvent = new RecallAgentsEvent();
 		SendAgentsEvent sendAgentsEvent = new SendAgentsEvent();
 		TickBroadcast tickBroadcast = new TickBroadcast();
+		MwentHome mwentHome = new MwentHome();
 
 		messages.add(agentsAvailableEvent);
 		messages.add(gadgetAvailableEvent);
@@ -215,6 +218,7 @@ public class MessageBrokerImpl implements MessageBroker {
 		messages.add(recallAgentsEvent);
 		messages.add(sendAgentsEvent);
 		messages.add(tickBroadcast);
+		messages.add(mwentHome);
 
 		return messages;
 	}

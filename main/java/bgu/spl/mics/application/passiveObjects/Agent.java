@@ -71,6 +71,8 @@ public class Agent {
 	 * Releases an agent.
 	 */
 	public void release(){
+		System.out.println(this.getSerialNumber()+" has been released");
 		available=true;
+		notifyAll();
 	}
 }

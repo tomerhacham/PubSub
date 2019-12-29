@@ -59,8 +59,8 @@ public class MI6Runner {
         Long M = (Long)services.get("M");
         for(int i=0;i<Moneypenny;i++){
             Moneypenny moneypenny;
-            if(i==0){moneypenny= new Moneypenny(i+1,countDown,true);}
-            else{moneypenny= new Moneypenny(i+1,countDown,false);}
+            if(i==0){moneypenny= new Moneypenny(i+1,countDown,true,M.intValue());}
+            else{moneypenny= new Moneypenny(i+1,countDown,false,M.intValue());}
                 Thread moneypenny_thread = new Thread(moneypenny);
                 moneypenny_thread.setName("Moneypenny "+(i+1));
                 threads.add(moneypenny_thread);
@@ -77,7 +77,7 @@ public class MI6Runner {
         //endregion
 
         //region Create Q
-        Q q = new Q(countDown);
+        Q q = new Q(countDown,M.intValue());
         Thread q_thread = new Thread(q);
         q_thread.setName("Q");
         threads.add(q_thread);
